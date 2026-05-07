@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-green: #008A0E;
+  --primary-blue: #293AFF;
+  --green-light: #E8F5E9;
+  --blue-light: #E3F2FD;
+  --green-dark: #006607;
+  --blue-dark: #1A28CC;
+  --gray-50: #FAFAFA;
+  --gray-100: #F5F5F5;
+  --gray-200: #EEEEEE;
+  --gray-300: #E0E0E0;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --background: #FFFFFF;
+  --foreground: #212121;
+}
+
+body {
+  background-color: var(--gray-50);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-600);
+}
+
+/* Sidebar link hover effects */
+.sidebar-link-green:hover {
+  background-color: rgba(0, 138, 14, 0.15) !important;
+  color: #008A0E !important;
+}
+
+.sidebar-link-blue:hover {
+  background-color: rgba(41, 58, 255, 0.15) !important;
+  color: #293AFF !important;
+}
+
+/* Spin animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

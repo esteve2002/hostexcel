@@ -189,7 +189,7 @@ export default function Home() {
       productoStats[key].costo = (costoPorProducto[key] || 0) * productoStats[key].cantidad;
     });
 
-    let mejorProducto = null;
+    let mejorProducto: { producto: string; margen: number; revenue: number } | null = null;
     let mejorMargen = -Infinity;
 
     Object.entries(productoStats).forEach(([producto, stats]) => {
@@ -201,7 +201,7 @@ export default function Home() {
     });
 
     return mejorProducto;
-  }, [ventas, escandallo]);
+  }, [ventas, escandallo]) as { producto: string; margen: number; revenue: number } | null;
 
   // Alertas
   const alertas = useMemo(() => {
@@ -217,7 +217,7 @@ export default function Home() {
     }
 
     // Alertas de sin ventas recientes (últimas 3 semanas)
-    const weeksToCheck = [];
+    const weeksToCheck: string[] = [];
     for (let i = 0; i < 3; i++) {
       const d = new Date();
       d.setDate(d.getDate() - (i * 7));
@@ -530,7 +530,7 @@ export default function Home() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" />
               <YAxis />
-              <Tooltip formatter={(value: number) => `€${value.toFixed(2)}`} />
+              <Tooltip formatter={(value) => `€${Number(value).toFixed(2)}`} />
               <Bar dataKey="total" fill="#008A0E" name="Total Ventas" />
             </BarChart>
           </ResponsiveContainer>

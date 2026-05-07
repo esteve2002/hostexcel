@@ -202,6 +202,7 @@ export default function RegisterPage() {
                 setErrors({ ...errors, nombre: "El nombre debe tener al menos 2 caracteres" });
               }
             }}
+            onKeyDown={(e) => e.key === "Enter" && handleRegister()}
             placeholder="Mi Restaurante"
             style={{
               display: "block",
@@ -264,46 +265,9 @@ export default function RegisterPage() {
             type="password"
             value={password}
             onChange={(e) => {
-              setPassword(e.target.value);
-              if (errors.password) setErrors({ ...errors, password: undefined });
+              setTelefono(e.target.value);
             }}
-            onBlur={() => {
-              if (password && password.length < 6) {
-                setErrors({ ...errors, password: "Mínimo 6 caracteres" });
-              }
-            }}
-            placeholder="••••••••"
-            style={{
-              display: "block",
-              width: "100%",
-              marginTop: 6,
-              marginBottom: 4,
-              padding: "10px 12px",
-              borderRadius: 8,
-              border: `1px solid ${errors.password ? "#f5c6c6" : "#ddd"}`,
-              fontSize: 14,
-              boxSizing: "border-box",
-              background: errors.password ? "#fff0f0" : "white",
-            }}
-          />
-          {errors.password && (
-            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#c0392b" }}>{errors.password}</p>
-          )}
-          {!errors.password && password.length > 0 && password.length < 6 && (
-            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#f39c12" }}>
-              Faltan {6 - password.length} caracteres más
-            </p>
-          )}
-        </div>
-
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>
-            Teléfono (opcional)
-          </label>
-          <input
-            type="tel"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleRegister()}
             placeholder="+34 600 000 000"
             style={{
               display: "block",

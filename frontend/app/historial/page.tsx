@@ -46,7 +46,7 @@ export default function HistorialPage() {
       return;
     }
 
-    fetch("http://localhost:8000/historial/uploads", {
+    fetch(`/api/historial/uploads`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

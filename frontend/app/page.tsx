@@ -79,7 +79,7 @@ export default function Home() {
 
     const fetchData = async () => {
       try {
-        const meRes = await fetch("http://localhost:8000/auth/me", {
+        const meRes = await fetch("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -92,16 +92,16 @@ export default function Home() {
         setRestaurante(meData.nombre_restaurante);
 
         const [v, i, e, p] = await Promise.all([
-          fetch("http://localhost:8000/datos/ventas", {
+          fetch("/api/datos/ventas", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/inventario", {
+          fetch("/api/datos/inventario", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/escandallo", {
+          fetch("/api/datos/escandallo", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/proveedores", {
+          fetch("/api/datos/proveedores", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

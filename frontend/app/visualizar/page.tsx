@@ -84,16 +84,16 @@ export default function VisualizarPage() {
     const fetchData = async () => {
       try {
         const [ventasRes, inventarioRes, escandalloRes, proveedoresRes] = await Promise.all([
-          fetch("http://localhost:8000/datos/ventas", {
+          fetch(`/api/datos/ventas`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/inventario", {
+          fetch(`/api/datos/inventario`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/escandallo", {
+          fetch(`/api/datos/escandallo`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/datos/proveedores", {
+          fetch(`/api/datos/proveedores`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

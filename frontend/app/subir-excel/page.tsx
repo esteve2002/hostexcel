@@ -53,7 +53,7 @@ export default function SubirExcelPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/excel/upload?save=true", {
+      const res = await fetch(`/api/excel/upload?save=true`, {
         method: "POST",
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
@@ -95,7 +95,7 @@ export default function SubirExcelPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/excel/upload/force", {
+      const res = await fetch(`/api/excel/upload?force=true`, {
         method: "POST",
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,

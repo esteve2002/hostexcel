@@ -1,13 +1,8 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-
+import os
 
 from fastapi.middleware.cors import CORSMiddleware
-
-
-
-
-
 
 
 
@@ -24,14 +19,17 @@ from app.routers.historial import router as historial_router
 app.include_router(historial_router)
 
 
-
 app.include_router(excel_router)
 app.include_router(auth_router)
 app.include_router(datos_router)
 
+# CORS configuration - read from env or use defaults
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000")
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

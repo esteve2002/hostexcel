@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+type ValidationErrors = {
+  email?: string;
+  password?: string;
+  nombre?: string;
+  general?: string;
+};
+
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -10,41 +17,103 @@ export default function RegisterPage() {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<ValidationErrors>({});
   const [success, setSuccess] = useState(false);
 
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+
+    // Validar email
+    if (!email.trim()) {
+      newErrors.email = "El email es obligatorio";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "El formato del email no es válido (ej: usuario@dominio.com)";
+    }
+
+    // Validar contraseña
+    if (!password) {
+      newErrors.password = "La contraseña es obligatoria";
+    } else if (password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+    } else if (password.length > 50) {
+      newErrors.password = "La contraseña no puede superar los 50 caracteres";
+    }
+
+    // Validar nombre
+    if (!nombre.trim()) {
+      newErrors.nombre = "El nombre del restaurante es obligatorio";
+    } else if (nombre.trim().length < 2) {
+      newErrors.nombre = "El nombre debe tener al menos 2 caracteres";
+    } else if (nombre.trim().length > 100) {
+      newErrors.nombre = "El nombre no puede superar los 100 caracteres";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleRegister = async () => {
-    if (!email || !password || !nombre) {
-      return setError("Email, contraseña y nombre son obligatorios");
+    setErrors({});
+    
+    if (!validateForm()) {
+      return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
+          email: email.trim(),
           password,
-          nombre_restaurante: nombre,
-          telefono,
+          nombre_restaurante: nombre.trim(),
+          telefono: telefono.trim() || null,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(typeof data.detail === "string" ? data.detail : "Error al registrarse");
+        // Manejar diferentes tipos de errores del servidor
+        if (data.detail) {
+          if (Array.isArray(data.detail)) {
+            // Error de validación de FastAPI
+            const serverErrors: ValidationErrors = {};
+            data.detail.forEach((err: any) => {
+              if (err.loc && err.loc.includes("email")) {
+                serverErrors.email = err.msg;
+              } else if (err.loc && err.loc.includes("password")) {
+                serverErrors.password = err.msg;
+              } else if (err.loc && err.loc.includes("nombre_restaurante")) {
+                serverErrors.nombre = err.msg;
+              } else {
+                serverErrors.general = err.msg || "Error de validación";
+              }
+            });
+            setErrors(serverErrors);
+          } else if (typeof data.detail === "string") {
+            // Error de string simple
+            if (data.detail.includes("email") || data.detail.includes("ya existe")) {
+              setErrors({ email: "Este email ya está registrado" });
+            } else {
+              setErrors({ general: data.detail });
+            }
+          } else {
+            setErrors({ general: "Error al registrarse" });
+          }
+        } else {
+          setErrors({ general: "Error al registrarse. Por favor, inténtalo de nuevo." });
+        }
       } else {
         setSuccess(true);
         setTimeout(() => {
           router.push("/login");
         }, 2000);
       }
-    } catch {
-      setError("Error de conexión con el servidor");
+    } catch (err) {
+      setErrors({ general: "Error de conexión. Verifica tu internet e inténtalo de nuevo." });
     }
 
     setLoading(false);
@@ -70,7 +139,7 @@ export default function RegisterPage() {
           <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
           <h2 style={{ color: "#008A0E", marginBottom: 8 }}>¡Registro exitoso!</h2>
           <p style={{ color: "#666", fontSize: 14 }}>
-            Redirigiendo al login...
+            Tu cuenta ha sido creada. Redirigiendo al login...
           </p>
         </div>
       </div>
@@ -100,76 +169,169 @@ export default function RegisterPage() {
           Crea tu cuenta de restaurante
         </p>
 
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>Nombre del Restaurante</label>
-        <input
-          type="text"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          placeholder="Mi Restaurante"
-          style={{
-            display: "block", width: "100%", marginTop: 6, marginBottom: 16,
-            padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd",
-            fontSize: 14, boxSizing: "border-box",
-          }}
-        />
-
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="tu@restaurante.com"
-          style={{
-            display: "block", width: "100%", marginTop: 6, marginBottom: 16,
-            padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd",
-            fontSize: 14, boxSizing: "border-box",
-          }}
-        />
-
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>Contraseña</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          style={{
-            display: "block", width: "100%", marginTop: 6, marginBottom: 16,
-            padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd",
-            fontSize: 14, boxSizing: "border-box",
-          }}
-        />
-
-        <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>Teléfono (opcional)</label>
-        <input
-          type="tel"
-          value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
-          placeholder="+34 600 000 000"
-          style={{
-            display: "block", width: "100%", marginTop: 6, marginBottom: 24,
-            padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd",
-            fontSize: 14, boxSizing: "border-box",
-          }}
-        />
-
-        {error && (
+        {errors.general && (
           <div style={{
-            marginBottom: 16, padding: "10px 14px",
-            background: "#fff0f0", border: "1px solid #f5c6c6",
-            borderRadius: 8, color: "#c0392b", fontSize: 13,
+            marginBottom: 16,
+            padding: "10px 14px",
+            background: "#fff0f0",
+            border: "1px solid #f5c6c6",
+            borderRadius: 8,
+            color: "#c0392b",
+            fontSize: 13,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
           }}>
-            ❌ {error}
+            ❌ {errors.general}
           </div>
         )}
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: errors.nombre ? "#c0392b" : "#444" }}>
+            Nombre del Restaurante *
+          </label>
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => {
+              setNombre(e.target.value);
+              if (errors.nombre) setErrors({ ...errors, nombre: undefined });
+            }}
+            onBlur={() => {
+              if (nombre && nombre.trim().length < 2) {
+                setErrors({ ...errors, nombre: "El nombre debe tener al menos 2 caracteres" });
+              }
+            }}
+            placeholder="Mi Restaurante"
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 4,
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: `1px solid ${errors.nombre ? "#f5c6c6" : "#ddd"}`,
+              fontSize: 14,
+              boxSizing: "border-box",
+              background: errors.nombre ? "#fff0f0" : "white",
+            }}
+          />
+          {errors.nombre && (
+            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#c0392b" }}>{errors.nombre}</p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: errors.email ? "#c0392b" : "#444" }}>
+            Email *
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors({ ...errors, email: undefined });
+            }}
+            onBlur={() => {
+              if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                setErrors({ ...errors, email: "Formato inválido" });
+              }
+            }}
+            placeholder="tu@restaurante.com"
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 4,
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: `1px solid ${errors.email ? "#f5c6c6" : "#ddd"}`,
+              fontSize: 14,
+              boxSizing: "border-box",
+              background: errors.email ? "#fff0f0" : "white",
+            }}
+          />
+          {errors.email && (
+            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#c0392b" }}>{errors.email}</p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: errors.password ? "#c0392b" : "#444" }}>
+            Contraseña * (mínimo 6 caracteres)
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors({ ...errors, password: undefined });
+            }}
+            onBlur={() => {
+              if (password && password.length < 6) {
+                setErrors({ ...errors, password: "Mínimo 6 caracteres" });
+              }
+            }}
+            placeholder="••••••••"
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 4,
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: `1px solid ${errors.password ? "#f5c6c6" : "#ddd"}`,
+              fontSize: 14,
+              boxSizing: "border-box",
+              background: errors.password ? "#fff0f0" : "white",
+            }}
+          />
+          {errors.password && (
+            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#c0392b" }}>{errors.password}</p>
+          )}
+          {!errors.password && password.length > 0 && password.length < 6 && (
+            <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#f39c12" }}>
+              Faltan {6 - password.length} caracteres más
+            </p>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>
+            Teléfono (opcional)
+          </label>
+          <input
+            type="tel"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            placeholder="+34 600 000 000"
+            style={{
+              display: "block",
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 4,
+              padding: "10px 12px",
+              borderRadius: 8,
+              border: "1px solid #ddd",
+              fontSize: 14,
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
 
         <button
           onClick={handleRegister}
           disabled={loading}
           style={{
-            width: "100%", padding: "12px",
+            width: "100%",
+            padding: "12px",
             background: loading ? "#aaa" : "#008A0E",
-            color: "white", border: "none", borderRadius: 8,
-            fontSize: 15, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            fontSize: 15,
+            fontWeight: 600,
+            cursor: loading ? "not-allowed" : "pointer",
             transition: "all 0.2s ease",
           }}
         >
@@ -177,7 +339,10 @@ export default function RegisterPage() {
         </button>
 
         <p style={{
-          textAlign: "center", marginTop: 20, fontSize: 14, color: "#666"
+          textAlign: "center",
+          marginTop: 20,
+          fontSize: 14,
+          color: "#666",
         }}>
           ¿Ya tienes cuenta?{" "}
           <a

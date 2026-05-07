@@ -7,6 +7,11 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
   const path = request.nextUrl.pathname;
 
+  // Si es una ruta API, dejar pasar (la autenticación se maneja en cada endpoint)
+  if (path.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   // Si es ruta pública, dejar pasar
   if (PUBLIC_ROUTES.includes(path)) {
     return NextResponse.next();

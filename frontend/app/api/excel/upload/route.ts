@@ -32,7 +32,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Error desconocido'
+    const message = error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : error && typeof error === 'object' && 'message' in error
+          ? String((error as { message?: unknown }).message || 'Error desconocido')
+          : JSON.stringify(error) || 'Error desconocido'
     const status = message.includes('sobreescribirlas') ? 409 : 400
     return NextResponse.json({ error: message }, { status })
   }

@@ -269,7 +269,9 @@ export function validateProveedores(data: ExcelRow[]): ExcelRow[] {
 export async function uploadToSupabase(table: string, data: ExcelRow[], userId: string) {
   const dataWithUser = data.map(row => ({ ...row, user_id: userId }))
   const { error } = await supabase.from(table).insert(dataWithUser)
-  if (error) throw error
+  if (error) {
+    throw new Error(error.message || `Error al insertar en ${table}`)
+  }
 }
 
 export async function processExcel(
@@ -305,6 +307,9 @@ export async function processExcel(
             throw new Error(`Fecha inválida (${fecha})`)
           })
           .sort((a, b) => a.getTime() - b.getTime())
+        if (fechas.length === 0 || fechas.some((f) => Number.isNaN(f.getTime()))) {
+          throw new Error('No se pudieron interpretar las fechas del Excel de ventas')
+        }
         const fechaMin = fechas[0].toISOString().split('T')[0]
         const fechaMax = fechas[fechas.length - 1].toISOString().split('T')[0]
 

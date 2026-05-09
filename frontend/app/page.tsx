@@ -275,85 +275,58 @@ export default function Home() {
     return (
       <div style={{
         minHeight: "100vh",
-        background: "#FAFAFA",
+        background: "var(--bg-warm)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <div style={{
-          background: "white",
-          borderRadius: 20,
+        <div className="card animate-scale-in" style={{
           padding: "48px 56px",
-          boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
           textAlign: "center",
         }}>
           <div style={{
             width: 64,
             height: 64,
-            border: "4px solid #E0E0E0",
-            borderTopColor: "#008A0E",
+            border: "4px solid var(--border-light)",
+            borderTopColor: "var(--primary)",
             borderRadius: "50%",
             animation: "spin 1s linear infinite",
             margin: "0 auto 20px",
           }}></div>
-          <p style={{ color: "#666", fontSize: 16, margin: 0 }}>Cargando dashboard...</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 16, margin: 0 }}>Cargando dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "24px 40px", maxWidth: 1400, margin: "0 auto" }}>
-      {/* Header */}
+    <div style={{ maxWidth: 1400, margin: "0 auto" }}>
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 32,
+        alignItems: "flex-end",
+        marginBottom: 36,
       }}>
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a2e", margin: "0 0 8px 0" }}>
-            🏢 Bienvenido
+          <p style={{ fontSize: 14, color: "var(--text-muted)", margin: "0 0 4px 0", fontWeight: 500, letterSpacing: "0.5px" }}>
+            PANEL PRINCIPAL
+          </p>
+          <h1 style={{ fontSize: 28, margin: 0, color: "var(--text-primary)" }}>
+            Bienvenido, {restaurante || "usuario"}
           </h1>
-          <h2 style={{ fontSize: 22, fontWeight: 600, color: "#008A0E", margin: 0 }}>
-            {restaurante}
-          </h2>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={() => router.push("/subir-excel")}
-            style={{
-              padding: "12px 28px",
-              background: "#008A0E",
-              color: "white",
-              border: "none",
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#006607"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#008A0E"; }}
+            className="btn-primary"
+            style={{ padding: "11px 24px", fontSize: 14 }}
           >
             📤 SUBIR EXCEL
           </button>
           <button
             onClick={() => router.push("/visualizar")}
-            style={{
-              padding: "12px 28px",
-              background: "rgba(0, 138, 14, 0.1)",
-              color: "#008A0E",
-              border: "2px solid #008A0E",
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(0, 138, 14, 0.2)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(0, 138, 14, 0.1)"; }}
+            className="btn-secondary"
+            style={{ padding: "11px 24px", fontSize: 14 }}
           >
             📊 Ver Datos
           </button>
@@ -362,215 +335,153 @@ export default function Home() {
 
       {error && (
         <div style={{
-          background: "#fff0f0",
-          border: "1px solid #f5c6c6",
-          borderRadius: 12,
+          background: "#FFF5F5",
+          border: "1px solid #FFD7D7",
+          borderRadius: "var(--radius-md)",
           padding: "16px 20px",
           marginBottom: 24,
-          color: "#c0392b",
+          color: "#D94A4A",
           display: "flex",
           alignItems: "center",
           gap: 12,
         }}>
-          <span style={{ fontSize: 20 }}>❌</span>
+          <span>❌</span>
           <span style={{ fontWeight: 600 }}>{error}</span>
         </div>
       )}
 
-      {/* KPIs Principales */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: 20,
         marginBottom: 32,
       }}>
-        {/* Ventas esta semana */}
-        <div style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e0e0e0",
-          transition: "all 0.2s ease",
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-            e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 138, 14, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
-        >
-          <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-            📈 Ventas Esta Semana
-          </div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#008A0E" }}>
-            €{totalVentasSemana.toFixed(2)}
-          </div>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-            Semana {thisWeek}
-          </div>
-        </div>
-
-        {/* Margen Promedio */}
-        <div style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e0e0e0",
-          transition: "all 0.2s ease",
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-            e.currentTarget.style.boxShadow = "0 8px 24px rgba(41, 58, 255, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
-        >
-          <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-            📉 Margen Promedio
-          </div>
-          <div style={{
-            fontSize: 32,
-            fontWeight: 700,
-            color: margenPromedio >= 30 ? "#008A0E" : margenPromedio >= 15 ? "#FFA500" : "#f44",
-          }}>
-            {margenPromedio.toFixed(1)}%
-          </div>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-            {margenPromedio >= 30 ? "🟢 Excelente" : margenPromedio >= 15 ? "🟡 Normal" : "🔴 Crítico"}
-          </div>
-        </div>
-
-        {/* Plato más rentable */}
-        <div style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e0e0e0",
-          transition: "all 0.2s ease",
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-            e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 138, 14, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
-        >
-          <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-            🏆 Plato Más Rentable
-          </div>
-          {platoMasRentable ? (
-            <>
-              <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a2e" }}>
-                {platoMasRentable.producto}
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 600, color: "#008A0E", marginTop: 4 }}>
-                €{platoMasRentable.margen.toFixed(2)}
-              </div>
-            </>
-          ) : (
-            <div style={{ fontSize: 16, color: "#888", fontStyle: "italic" }}>
-              No hay datos suficientes
+        {[
+          {
+            icon: "📈",
+            label: "Ventas Esta Semana",
+            value: `€${totalVentasSemana.toFixed(2)}`,
+            sub: `Semana ${thisWeek}`,
+            color: "var(--primary)",
+            accent: "var(--primary-glow)",
+          },
+          {
+            icon: "📉",
+            label: "Margen Promedio",
+            value: `${margenPromedio.toFixed(1)}%`,
+            sub: margenPromedio >= 30 ? "Excelente" : margenPromedio >= 15 ? "Normal" : "Crítico",
+            color: margenPromedio >= 30 ? "var(--primary)" : margenPromedio >= 15 ? "var(--accent)" : "#D94A4A",
+            accent: "transparent",
+          },
+          {
+            icon: "🏆",
+            label: "Plato Más Rentable",
+            value: platoMasRentable ? platoMasRentable.producto : "—",
+            sub: platoMasRentable ? `€${platoMasRentable.margen.toFixed(2)}` : "Sin datos",
+            color: "var(--text-primary)",
+            accent: "transparent",
+          },
+          {
+            icon: "🏢",
+            label: "Total Proveedores",
+            value: String(proveedores.length),
+            sub: `${proveedores.filter(p => p.email).length} con email`,
+            color: "var(--primary)",
+            accent: "var(--primary-glow)",
+          },
+        ].map((kpi, idx) => (
+          <div
+            key={idx}
+            className="card card-hover animate-fade-in-up"
+            style={{
+              padding: 24,
+              animationDelay: `${idx * 0.08}s`,
+            }}
+          >
+            <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 12, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
+              {kpi.icon} {kpi.label}
             </div>
-          )}
-        </div>
-
-        {/* Total Proveedores */}
-        <div style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e0e0e0",
-          transition: "all 0.2s ease",
-        }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-4px)";
-            e.currentTarget.style.boxShadow = "0 8px 24px rgba(41, 58, 255, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
-        >
-          <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-            🏢 Total Proveedores
+            <div style={{
+              fontSize: kpi.value.length > 12 ? 20 : 28,
+              fontWeight: 700,
+              color: kpi.color,
+              fontFamily: "var(--font-display)",
+              lineHeight: 1.2,
+              wordBreak: "break-word",
+            }}>
+              {kpi.value}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>
+              {kpi.sub}
+            </div>
+            <div style={{
+              marginTop: 16,
+              height: 3,
+              background: "var(--border-light)",
+              borderRadius: 2,
+              overflow: "hidden",
+            }}>
+              <div style={{
+                height: "100%",
+                width: `${Math.min(100, idx === 1 ? margenPromedio : idx === 3 ? (proveedores.length / 10) * 100 : 70)}%`,
+                background: kpi.color,
+                borderRadius: 2,
+                transition: "width 1s ease",
+              }} />
+            </div>
           </div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#293AFF" }}>
-            {proveedores.length}
-          </div>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
-            {proveedores.filter(p => p.email).length} con email
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Gráfico de ventas por día */}
-      <div style={{
-        background: "white",
-        borderRadius: 16,
-        padding: 24,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-        border: "1px solid #e0e0e0",
-        marginBottom: 32,
-      }}>
-        <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+      <div className="card" style={{ padding: 24, marginBottom: 32 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
           📅 Ventas por Día - Esta Semana
         </h3>
         <div style={{ width: "100%", height: 300 }}>
           <ResponsiveContainer>
             <BarChart data={ventasPorDiaSemana}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip formatter={(value) => `€${Number(value).toFixed(2)}`} />
-              <Bar dataKey="total" fill="#008A0E" name="Total Ventas" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
+              <XAxis dataKey="day" tick={{ fontSize: 13, fill: "var(--text-muted)" }} />
+              <YAxis tick={{ fontSize: 13, fill: "var(--text-muted)" }} />
+              <Tooltip
+                formatter={(value) => [`€${Number(value).toFixed(2)}`, "Total"]}
+                contentStyle={{
+                  borderRadius: 8,
+                  border: "1px solid var(--border-light)",
+                  boxShadow: "var(--shadow-md)",
+                }}
+              />
+              <Bar dataKey="total" fill="var(--primary)" radius={[6, 6, 0, 0]} name="Total Ventas" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Alertas */}
       {alertas.length > 0 && (
-        <div style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-          border: "1px solid #e0e0e0",
-          marginBottom: 32,
-        }}>
-          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="card" style={{ padding: 24, marginBottom: 32 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
             ⚠️ Alertas
           </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {alertas.map((alerta, idx) => (
               <div
                 key={idx}
                 style={{
-                  padding: "16px 20px",
-                  borderRadius: 12,
-                  background: alerta.type === "error" ? "rgba(255, 68, 68, 0.05)" : alerta.type === "warning" ? "rgba(255, 165, 0, 0.05)" : "rgba(0, 138, 14, 0.05)",
-                  border: `1px solid ${alerta.type === "error" ? "#f44" : alerta.type === "warning" ? "#FFA500" : "#008A0E"}`,
+                  padding: "14px 18px",
+                  borderRadius: "var(--radius-sm)",
+                  background: alerta.type === "error" ? "#FFF5F5" : alerta.type === "warning" ? "#FFFBF0" : "rgba(91, 123, 58, 0.06)",
+                  border: `1px solid ${alerta.type === "error" ? "#FFD7D7" : alerta.type === "warning" ? "#FFEBB5" : "rgba(91, 123, 58, 0.15)"}`,
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
                 }}
               >
-                <span style={{ fontSize: 24 }}>
-                  {alerta.type === "error" ? "🔴" : alerta.type === "warning" ? "⚠️" : "ℹ"}
+                <span style={{ fontSize: 20 }}>
+                  {alerta.type === "error" ? "🔴" : alerta.type === "warning" ? "⚠️" : "ℹ️"}
                 </span>
                 <span style={{
                   fontSize: 14,
-                  color: alerta.type === "error" ? "#c0392b" : alerta.type === "warning" ? "#666" : "#333",
+                  color: alerta.type === "error" ? "#D94A4A" : "var(--text-primary)",
                   fontWeight: 500,
                 }}>
                   {alerta.message}
@@ -581,98 +492,37 @@ export default function Home() {
         </div>
       )}
 
-      {/* Enlaces rápidos */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: 16,
       }}>
-        <button
-          onClick={() => router.push("/visualizar")}
-          style={{
-            padding: 24,
-            background: "linear-gradient(135deg, rgba(0, 138, 14, 0.05) 0%, rgba(41, 58, 255, 0.05) 100%)",
-            border: "2px solid #e0e0e0",
-            borderRadius: 16,
-            cursor: "pointer",
-            textAlign: "left",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#008A0E";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#e0e0e0";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-        >
-          <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a2e", marginBottom: 4 }}>
-            Visualizar Datos
-          </div>
-          <div style={{ fontSize: 13, color: "#666" }}>
-            Gráficos y estadísticas detalladas
-          </div>
-        </button>
-
-        <button
-          onClick={() => router.push("/historial")}
-          style={{
-            padding: 24,
-            background: "linear-gradient(135deg, rgba(0, 138, 14, 0.05) 0%, rgba(41, 58, 255, 0.05) 100%)",
-            border: "2px solid #e0e0e0",
-            borderRadius: 16,
-            cursor: "pointer",
-            textAlign: "left",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#293AFF";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#e0e0e0";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-        >
-          <div style={{ fontSize: 32, marginBottom: 12 }}>📋</div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a2e", marginBottom: 4 }}>
-            Historial
-          </div>
-          <div style={{ fontSize: 13, color: "#666" }}>
-            Revisa tus subidas anteriores
-          </div>
-        </button>
-
-        <button
-          onClick={() => router.push("/configuracion")}
-          style={{
-            padding: 24,
-            background: "linear-gradient(135deg, rgba(0, 138, 14, 0.05) 0%, rgba(41, 58, 255, 0.05) 100%)",
-            border: "2px solid #e0e0e0",
-            borderRadius: 16,
-            cursor: "pointer",
-            textAlign: "left",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#293AFF";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#e0e0e0";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-        >
-          <div style={{ fontSize: 32, marginBottom: 12 }}>⚙️</div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#1a1a2e", marginBottom: 4 }}>
-            Configuración
-          </div>
-          <div style={{ fontSize: 13, color: "#666" }}>
-            Ajusta preferencias de tu cuenta
-          </div>
-        </button>
+        {[
+          { icon: "📊", title: "Visualizar Datos", desc: "Gráficos y estadísticas detalladas", path: "/visualizar" },
+          { icon: "📋", title: "Historial", desc: "Revisa tus subidas anteriores", path: "/historial" },
+          { icon: "⚙️", title: "Configuración", desc: "Ajusta preferencias de tu cuenta", path: "/configuracion" },
+        ].map((item, idx) => (
+          <button
+            key={idx}
+            onClick={() => router.push(item.path)}
+            className="card card-hover animate-fade-in-up"
+            style={{
+              padding: 24,
+              cursor: "pointer",
+              textAlign: "left",
+              border: "1px solid var(--border-light)",
+              animationDelay: `${0.3 + idx * 0.1}s`,
+            }}
+          >
+            <div style={{ fontSize: 28, marginBottom: 12 }}>{item.icon}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>
+              {item.title}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+              {item.desc}
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

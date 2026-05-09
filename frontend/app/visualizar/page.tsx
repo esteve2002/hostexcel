@@ -321,7 +321,7 @@ export default function VisualizarPage() {
     dataToUse.forEach((v) => {
       const fecha = parseFlexibleDate(v.fecha);
       if (!fecha) return;
-      const day = fecha.getDay();
+      const day = fecha.getUTCDay();
       totals[day] += v.revenue || 0;
       counts[day] += 1;
     });
@@ -613,7 +613,7 @@ export default function VisualizarPage() {
                   {top3ProductosVendidos[1] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(31,91,87,0.96) 0%, rgba(31,91,87,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 30px rgba(36,24,20,0.14)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      <div style={{ background: "linear-gradient(180deg, #C0C0C0 0%, #8E8E8E 100%)", color: "#1F1A17", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, boxShadow: "0 12px 30px rgba(36,24,20,0.14)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         {top3ProductosVendidos[1].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[1].total.toFixed(2)}</span>
                       </div>
@@ -627,7 +627,7 @@ export default function VisualizarPage() {
                   {top3ProductosVendidos[0] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      <div style={{ background: "linear-gradient(135deg, #FFD54A 0%, #C58B28 100%)", color: "#241814", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)", border: "1px solid rgba(255,255,255,0.18)" }}>
                         {top3ProductosVendidos[0].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[0].total.toFixed(2)}</span>
                       </div>
@@ -641,7 +641,7 @@ export default function VisualizarPage() {
                   {top3ProductosVendidos[2] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(194,76,42,0.96) 0%, rgba(194,76,42,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
+                      <div style={{ background: "linear-gradient(180deg, #CD7F32 0%, #9A5B20 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {top3ProductosVendidos[2].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[2].total.toFixed(2)}</span>
                       </div>
@@ -669,7 +669,7 @@ export default function VisualizarPage() {
                   {peores3Platos[1] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 30px rgba(36,24,20,0.14)" }}>
+                      <div style={{ background: "linear-gradient(180deg, #E5E4E2 0%, #A7A7A7 100%)", color: "#1F1A17", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, border: "1px solid rgba(255,255,255,0.18)", boxShadow: "0 12px 30px rgba(36,24,20,0.14)" }}>
                         {peores3Platos[1].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[1].margen.toFixed(2)}</span>
                       </div>
@@ -683,7 +683,7 @@ export default function VisualizarPage() {
                   {peores3Platos[0] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)" }}>
+                      <div style={{ background: "linear-gradient(135deg, #FFD54A 0%, #C58B28 100%)", color: "#241814", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)" }}>
                         {peores3Platos[0].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[0].margen.toFixed(2)}</span>
                       </div>
@@ -697,7 +697,7 @@ export default function VisualizarPage() {
                   {peores3Platos[2] && (
                     <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
+                      <div style={{ background: "linear-gradient(180deg, #CD7F32 0%, #9A5B20 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 700, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {peores3Platos[2].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[2].margen.toFixed(2)}</span>
                       </div>

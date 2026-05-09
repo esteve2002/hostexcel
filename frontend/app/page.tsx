@@ -194,7 +194,7 @@ export default function Home() {
     ventasEstaSemana.forEach(v => {
       const fecha = parseFlexibleDate(v.fecha);
       if (fecha) {
-        const day = fecha.getDay();
+        const day = fecha.getUTCDay();
         totals[day] += v.total || v.cantidad_vendida * v.precio_unitario;
         counts[day] += 1;
       }

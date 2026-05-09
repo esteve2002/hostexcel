@@ -541,6 +541,7 @@ input, select, textarea {
 .page-hero [style*="#FFA500"],
 .card [style*="#FFA500"] {
   background-color: rgba(255, 248, 236, 0.92) !important;
+  color: var(--text-primary) !important;
 }
 
 .section-card--pad {

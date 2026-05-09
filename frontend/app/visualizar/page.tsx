@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -69,7 +67,6 @@ export default function VisualizarPage() {
   const [escandallo, setEscandallo] = useState<Escandallo[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [weekFilter, setWeekFilter] = useState<string>("all");
-  const [availableWeeks, setAvailableWeeks] = useState<string[]>([]);
 
   useEffect(() => {
     const token = document.cookie
@@ -147,19 +144,15 @@ export default function VisualizarPage() {
     };
 
     fetchData();
-  }, []);
+  }, [router]);
 
   // Calcular semanas disponibles
-  useEffect(() => {
-    if (ventas.length > 0) {
-      const weeks = new Set<string>();
-      ventas.forEach((v) => {
-        const week = getWeekNumber(new Date(v.fecha));
-        weeks.add(week);
-      });
-      const sortedWeeks = Array.from(weeks).sort();
-      setAvailableWeeks(sortedWeeks);
-    }
+  const availableWeeks = useMemo(() => {
+    const weeks = new Set<string>();
+    ventas.forEach((v) => {
+      weeks.add(getWeekNumber(new Date(v.fecha)));
+    });
+    return Array.from(weeks).sort();
   }, [ventas]);
 
   // Filtrar ventas por semana
@@ -454,7 +447,7 @@ export default function VisualizarPage() {
   if (loading) {
     return (
       <div style={{ padding: 24 }}>
-        <p style={{ color: "#888" }}>Cargando datos...</p>
+        <p style={{ color: "var(--text-muted)" }}>Cargando datos...</p>
       </div>
     );
   }
@@ -473,12 +466,12 @@ export default function VisualizarPage() {
       {error && (
         <div
           style={{
-            background: "#fee",
-            border: "1px solid #fcc",
-            borderRadius: 8,
+            background: "rgba(194, 76, 42, 0.08)",
+            border: "1px solid rgba(194, 76, 42, 0.22)",
+            borderRadius: 12,
             padding: 16,
             marginBottom: 24,
-            color: "#c33",
+            color: "var(--primary)",
           }}
         >
           {error}
@@ -515,7 +508,7 @@ export default function VisualizarPage() {
 
             {/* Comparativa Semanal */}
             {comparativaSemanal && (
-              <div className="section-card section-card--pad" style={{ background: comparativaSemanal.change >= 0 ? "rgba(37,78,75,0.08)" : "rgba(188,75,47,0.08)", marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
+              <div className="section-card section-card--pad" style={{ background: comparativaSemanal.change >= 0 ? "rgba(31,91,87,0.08)" : "rgba(194,76,42,0.08)", marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ fontSize: 32 }}>
                   {comparativaSemanal.change >= 0 ? "📈" : "📉"}
                 </div>
@@ -548,7 +541,7 @@ export default function VisualizarPage() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, marginTop: 8 }}>
               <div>
                 <VentasTab data={filteredVentas} />
               </div>
@@ -557,12 +550,13 @@ export default function VisualizarPage() {
                 <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
                   📈 Evolución de Ventas
                 </h3>
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ marginRight: 8, fontWeight: 500 }}>Filtrar por semana:</label>
+                <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <label style={{ fontWeight: 500, color: "var(--text-secondary)" }}>Filtrar por semana:</label>
                   <select
                     value={weekFilter}
                     onChange={(e) => setWeekFilter(e.target.value)}
-                    style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #ddd" }}
+                    className="input-field"
+                    style={{ marginTop: 0, maxWidth: 220 }}
                   >
                     <option value="all">Todas las semanas</option>
                     {availableWeeks.map((week) => (
@@ -601,34 +595,21 @@ export default function VisualizarPage() {
             </div>
 
             {/* Top 3 Platos Más Vendidos */}
-            <div style={{ marginTop: 40 }}>
+            <div style={{ marginTop: 48 }}>
               <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)" }}>
                 🏆 Top 3 Platos Más Vendidos
               </h3>
               {top3ProductosVendidos.length > 0 ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 24, height: 220 }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 28, height: 260, flexWrap: "wrap" }}>
                   {/* 2do lugar */}
                   {top3ProductosVendidos[1] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div
-                        style={{
-                           background: "rgba(255,248,236,0.92)",
-                           color: "var(--text-primary)",
-                          padding: "12px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 80,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(180deg, rgba(31,91,87,0.96) 0%, rgba(31,91,87,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 92, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 30px rgba(36,24,20,0.14)", border: "1px solid rgba(255,255,255,0.12)" }}>
                         {top3ProductosVendidos[1].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[1].total.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[1].total.toFixed(2)}</span>
                       </div>
-                       <div style={{ background: "var(--secondary)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "var(--secondary)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         2°
                       </div>
                     </div>
@@ -638,25 +619,11 @@ export default function VisualizarPage() {
                   {top3ProductosVendidos[0] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div
-                        style={{
-                          background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
-                          color: "white",
-                          padding: "16px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 100,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                          boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 8px", borderRadius: "12px 12px 0 0", height: 112, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)", border: "1px solid rgba(255,255,255,0.12)" }}>
                         {top3ProductosVendidos[0].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[0].total.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[0].total.toFixed(2)}</span>
                       </div>
-                       <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         1°
                       </div>
                     </div>
@@ -666,24 +633,11 @@ export default function VisualizarPage() {
                   {top3ProductosVendidos[2] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div
-                        style={{
-                          background: "var(--primary)",
-                          color: "white",
-                          padding: "10px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 60,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(180deg, rgba(194,76,42,0.96) 0%, rgba(194,76,42,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 72, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {top3ProductosVendidos[2].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[2].total.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[2].total.toFixed(2)}</span>
                       </div>
-                       <div style={{ background: "var(--primary)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "var(--primary)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         3°
                       </div>
                     </div>
@@ -697,34 +651,21 @@ export default function VisualizarPage() {
             </div>
 
             {/* Peores 3 Platos (Menor Margen) */}
-            <div style={{ marginTop: 32 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e" }}>
+            <div style={{ marginTop: 40 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)" }}>
                 ⚠️ Peores 3 Platos (Menor Margen)
               </h3>
               {peores3Platos.length > 0 ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 16, height: 200 }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 28, height: 260, flexWrap: "wrap" }}>
                   {/* 2do peor */}
                   {peores3Platos[1] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div
-                        style={{
-                          background: "#FFD700",
-                          color: "#333",
-                          padding: "12px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 80,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 92, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 30px rgba(36,24,20,0.14)" }}>
                         {peores3Platos[1].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>Margen: €{peores3Platos[1].margen.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[1].margen.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "#FFD700", color: "#333", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "var(--accent)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         2°
                       </div>
                     </div>
@@ -734,24 +675,11 @@ export default function VisualizarPage() {
                   {peores3Platos[0] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div
-                        style={{
-                          background: "#f44",
-                          color: "white",
-                          padding: "16px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 100,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 8px", borderRadius: "12px 12px 0 0", height: 112, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)" }}>
                         {peores3Platos[0].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>Margen: €{peores3Platos[0].margen.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[0].margen.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "#f44", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "var(--primary)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         1°
                       </div>
                     </div>
@@ -761,31 +689,18 @@ export default function VisualizarPage() {
                   {peores3Platos[2] && (
                     <div style={{ textAlign: "center", width: 120 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div
-                        style={{
-                          background: "#FFA500",
-                          color: "white",
-                          padding: "10px 8px",
-                          borderRadius: "8px 8px 0 0",
-                          height: 60,
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          fontWeight: 600,
-                          fontSize: 14,
-                        }}
-                      >
+                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 72, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {peores3Platos[2].producto}
-                        <span style={{ fontSize: 12, opacity: 0.9 }}>Margen: €{peores3Platos[2].margen.toFixed(2)}</span>
+                        <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[2].margen.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "#FFA500", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                      <div style={{ background: "var(--accent)", color: "white", padding: "4px", borderRadius: "0 0 12px 12px", fontWeight: 700 }}>
                         3°
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <div style={{ color: "#888", textAlign: "center", padding: 20 }}>
+                <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 20 }}>
                   No hay datos suficientes
                 </div>
               )}
@@ -820,7 +735,7 @@ export default function VisualizarPage() {
 // ===== VENTAS TAB =====
 function VentasTab({ data }: { data: Venta[] }) {
   if (data.length === 0) {
-    return <div style={{ color: "#888", textAlign: "center", padding: 40 }}>No hay datos de ventas</div>;
+    return <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 40 }}>No hay datos de ventas</div>;
   }
 
   const totalVentas = data.reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0);
@@ -829,10 +744,10 @@ function VentasTab({ data }: { data: Venta[] }) {
 
   return (
     <div className="stack-lg">
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24, marginBottom: 28 }}>
-              <StatCard label="Total Ventas" value={totalVentas.toFixed(2)} color="var(--secondary)" />
-              <StatCard label="Cantidad Promedio" value={cantidadPromedio} color="var(--primary)" />
-              <StatCard label="Productos Vendidos" value={productos.toString()} color="var(--secondary)" />
+      <div className="metric-grid metric-grid-3" style={{ marginBottom: 28 }}>
+        <StatCard label="Total Ventas" value={totalVentas.toFixed(2)} color="var(--secondary)" />
+        <StatCard label="Cantidad Promedio" value={cantidadPromedio} color="var(--primary)" />
+        <StatCard label="Productos Vendidos" value={productos.toString()} color="var(--secondary)" />
       </div>
 
       <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
@@ -897,11 +812,11 @@ function InventarioTab({
   return (
     <div>
       {/* Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
-        <StatCard label="Valor Total" value={`€${valorTotal.toFixed(2)}`} color="#293AFF" />
-        <StatCard label="Productos" value={totalProductos.toString()} color="#008A0E" />
-        <StatCard label="Bajo Stock" value={bajoStock.toString()} color={bajoStock > 0 ? "#f44" : "#008A0E"} />
-        <StatCard label="Stock Promedio" value={stockPromedio} color="#293AFF" />
+      <div className="metric-grid metric-grid-4" style={{ marginBottom: 24 }}>
+        <StatCard label="Valor Total" value={`€${valorTotal.toFixed(2)}`} color="var(--primary)" />
+        <StatCard label="Productos" value={totalProductos.toString()} color="var(--secondary)" />
+        <StatCard label="Bajo Stock" value={bajoStock.toString()} color={bajoStock > 0 ? "var(--primary)" : "var(--secondary)"} />
+        <StatCard label="Stock Promedio" value={stockPromedio} color="var(--primary)" />
       </div>
 
       {/* Alertas de Stock Mínimo */}
@@ -909,30 +824,30 @@ function InventarioTab({
         <div style={{ 
           marginBottom: 24, 
           padding: "20px 24px", 
-          background: "rgba(255, 68, 68, 0.05)", 
-          border: "1px solid #f44", 
-          borderRadius: 12 
+          background: "rgba(194, 76, 42, 0.06)", 
+          border: "1px solid rgba(194, 76, 42, 0.22)", 
+          borderRadius: 16 
         }}>
-          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#f44", display: "flex", alignItems: "center", gap: 8 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--primary)", display: "flex", alignItems: "center", gap: 8 }}>
             ⚠️ Alertas de Stock Mínimo
           </h3>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
-                <tr style={{ background: "rgba(255, 68, 68, 0.1)" }}>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Stock Actual</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Mínimo</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Faltante</th>
+                <tr style={{ background: "rgba(194, 76, 42, 0.08)" }}>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Producto</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Stock Actual</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Mínimo</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Faltante</th>
                 </tr>
               </thead>
               <tbody>
                 {productosBajoStock.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: "1px solid rgba(255, 68, 68, 0.2)" }}>
-                    <td style={{ padding: "12px 16px", color: "#333", fontWeight: 600 }}>{item.producto}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#f44", fontWeight: 700 }}>{item.stock_actual}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#666" }}>{item.stock_minimo}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#f44", fontWeight: 600 }}>{item.stock_minimo - item.stock_actual}</td>
+                  <tr key={idx} style={{ borderBottom: "1px solid rgba(56,41,31,0.08)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.producto}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--primary)", fontWeight: 700 }}>{item.stock_actual}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--text-secondary)" }}>{item.stock_minimo}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--primary)", fontWeight: 600 }}>{item.stock_minimo - item.stock_actual}</td>
                   </tr>
                 ))}
               </tbody>
@@ -944,33 +859,33 @@ function InventarioTab({
       {/* Rotación - Productos con más tiempo sin moverse */}
       {rotacionLenta.length > 0 && (
         <div style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
             🐌 Rotación - Productos Más Tiempo sin Moverse
           </h3>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
-                <tr style={{ background: "#f5f5f5" }}>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>#</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Stock Actual</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Última Compra</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Días en Stock</th>
+                <tr style={{ background: "rgba(255, 248, 236, 0.72)" }}>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>#</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Producto</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Stock Actual</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Última Compra</th>
+                  <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Días en Stock</th>
                 </tr>
               </thead>
               <tbody>
                 {rotacionLenta.map((item, idx) => (
                   <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                    <td style={{ padding: "12px 16px", color: "#666" }}>{idx + 1}</td>
-                    <td style={{ padding: "12px 16px", color: "#333", fontWeight: 600 }}>{item.producto}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#008A0E", fontWeight: 600 }}>{item.stock_actual}</td>
-                    <td style={{ padding: "12px 16px", color: "#666" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>{idx + 1}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.producto}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--secondary)", fontWeight: 600 }}>{item.stock_actual}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>
                       {new Date(item.fecha_ultima_compra).toLocaleDateString("es-ES")}
                     </td>
                     <td style={{ 
                       padding: "12px 16px", 
                       textAlign: "right", 
-                      color: (item.diasEnStock ?? 0) > 60 ? "#f44" : (item.diasEnStock ?? 0) > 30 ? "#FFA500" : "#666",
+                      color: (item.diasEnStock ?? 0) > 60 ? "var(--primary)" : (item.diasEnStock ?? 0) > 30 ? "var(--accent)" : "var(--text-secondary)",
                       fontWeight: 600 
                     }}>
                       {(item.diasEnStock ?? 0).toFixed(0)} días
@@ -984,7 +899,7 @@ function InventarioTab({
       )}
 
       {/* Estado del Inventario - Tabla completa */}
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
+      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
         📦 Estado del Inventario
       </h3>
       <table
@@ -995,28 +910,28 @@ function InventarioTab({
         }}
       >
         <thead>
-          <tr style={{ background: "#f9f9f9", borderBottom: "2px solid #ddd" }}>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Stock Actual</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Stock Mínimo</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Estado</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Última Compra</th>
+          <tr style={{ background: "rgba(255, 248, 236, 0.72)", borderBottom: "2px solid var(--border-light)" }}>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Producto</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Stock Actual</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Stock Mínimo</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Estado</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Última Compra</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item, idx) => {
             const estado = item.stock_actual <= item.stock_minimo ? "⚠️ Bajo Stock" : "✓ Normal";
-            const statusColor = item.stock_actual <= item.stock_minimo ? "#f44" : "#008A0E";
+            const statusColor = item.stock_actual <= item.stock_minimo ? "var(--primary)" : "var(--secondary)";
 
             return (
               <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <td style={{ padding: 12, color: "#333", fontWeight: 600 }}>{item.producto}</td>
+                <td style={{ padding: 12, color: "var(--text-primary)", fontWeight: 600 }}>{item.producto}</td>
                 <td style={{ padding: 12, textAlign: "right", color: statusColor, fontWeight: 600 }}>
                   {item.stock_actual}
                 </td>
-                <td style={{ padding: 12, textAlign: "right", color: "#666" }}>{item.stock_minimo}</td>
+                <td style={{ padding: 12, textAlign: "right", color: "var(--text-secondary)" }}>{item.stock_minimo}</td>
                 <td style={{ padding: 12, color: statusColor, fontWeight: 600 }}>{estado}</td>
-                <td style={{ padding: 12, color: "#666" }}>
+                <td style={{ padding: 12, color: "var(--text-secondary)" }}>
                   {new Date(item.fecha_ultima_compra).toLocaleDateString("es-ES")}
                 </td>
               </tr>
@@ -1037,7 +952,7 @@ function EscandalloTab({
   rentabilidad: { producto: string; precioVenta: number; costo: number; margen: number }[] 
 }) {
   if (data.length === 0) {
-    return <div style={{ color: "#888", textAlign: "center", padding: 40 }}>No hay datos de escandallo</div>;
+    return <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 40 }}>No hay datos de escandallo</div>;
   }
 
   const productos = new Set(data.map((e) => e.producto)).size;
@@ -1052,46 +967,46 @@ function EscandalloTab({
   return (
     <div>
       {/* Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
-        <StatCard label="Productos" value={productos.toString()} color="#008A0E" />
-        <StatCard label="Ingredientes" value={data.length.toString()} color="#293AFF" />
-        <StatCard label="Costo Promedio" value={`€${costoPromedio}`} color="#293AFF" />
+      <div className="metric-grid metric-grid-4" style={{ marginBottom: 24 }}>
+        <StatCard label="Productos" value={productos.toString()} color="var(--secondary)" />
+        <StatCard label="Ingredientes" value={data.length.toString()} color="var(--primary)" />
+        <StatCard label="Costo Promedio" value={`€${costoPromedio}`} color="var(--primary)" />
         <StatCard 
           label="Margen Promedio" 
           value={margenPromedio.toFixed(1) + "%"} 
-          color={margenPromedio >= 30 ? "#008A0E" : margenPromedio >= 15 ? "#FFA500" : "#f44"} 
+          color={margenPromedio >= 30 ? "var(--secondary)" : margenPromedio >= 15 ? "var(--accent)" : "var(--primary)"} 
         />
       </div>
 
       {/* Semáforo de Rentabilidad */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
-          🚦 Semáforo de Rentabilidad
-        </h3>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
+            🚦 Semáforo de Rentabilidad
+          </h3>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
-              <tr style={{ background: "#f5f5f5" }}>
-                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>#</th>
-                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Precio Venta</th>
-                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Costo</th>
-                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Margen %</th>
-                <th style={{ padding: "12px 16px", textAlign: "center", fontWeight: 600, color: "#333" }}>Estado</th>
+                <tr style={{ background: "rgba(255, 248, 236, 0.72)" }}>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>#</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Producto</th>
+                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Precio Venta</th>
+                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Costo</th>
+                <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Margen %</th>
+                <th style={{ padding: "12px 16px", textAlign: "center", fontWeight: 600, color: "var(--text-primary)" }}>Estado</th>
               </tr>
             </thead>
             <tbody>
               {rentabilidad.map((r, idx) => {
-                const color = r.margen >= 30 ? "#008A0E" : r.margen >= 15 ? "#FFA500" : "#f44";
+                const color = r.margen >= 30 ? "var(--secondary)" : r.margen >= 15 ? "var(--accent)" : "var(--primary)";
                 const icon = r.margen >= 30 ? "🟢" : r.margen >= 15 ? "🟡" : "🔴";
                 return (
                   <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                    <td style={{ padding: "12px 16px", color: "#666" }}>{idx + 1}</td>
-                    <td style={{ padding: "12px 16px", color: "#333", fontWeight: 600 }}>{r.producto}</td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#008A0E", fontWeight: 600 }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>{idx + 1}</td>
+                    <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{r.producto}</td>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--secondary)", fontWeight: 600 }}>
                       €{r.precioVenta.toFixed(2)}
                     </td>
-                    <td style={{ padding: "12px 16px", textAlign: "right", color: "#293AFF" }}>
+                    <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--primary)" }}>
                       €{r.costo.toFixed(2)}
                     </td>
                     <td style={{ padding: "12px 16px", textAlign: "right", color, fontWeight: 700 }}>
@@ -1110,9 +1025,9 @@ function EscandalloTab({
 
       {/* Costo vs Precio Venta - Barra Visual */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
-          📊 Costo Real vs Precio de Venta
-        </h3>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
+            📊 Costo Real vs Precio de Venta
+          </h3>
         <div style={{ width: "100%", height: 300 }}>
           <ResponsiveContainer>
             <BarChart data={rentabilidad}>
@@ -1120,8 +1035,8 @@ function EscandalloTab({
               <XAxis dataKey="producto" />
               <YAxis />
               <Tooltip formatter={(value) => `€${Number(value).toFixed(2)}`} />
-              <Bar dataKey="costo" fill="#293AFF" name="Costo" />
-              <Bar dataKey="precioVenta" fill="#008A0E" name="Precio Venta" />
+              <Bar dataKey="costo" fill="var(--primary)" name="Costo" />
+              <Bar dataKey="precioVenta" fill="var(--secondary)" name="Precio Venta" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1129,14 +1044,14 @@ function EscandalloTab({
 
       {/* Simulador de Precio */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
-          ⚙️ Simulador de Precio
-        </h3>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
+            ⚙️ Simulador de Precio
+          </h3>
         <SimuladorPrecio rentabilidad={rentabilidad} />
       </div>
 
       {/* Composición de Productos (Tabla Original) */}
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
+      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
         🧪 Composición de Productos
       </h3>
       <table
@@ -1147,22 +1062,22 @@ function EscandalloTab({
         }}
       >
         <thead>
-          <tr style={{ background: "#f9f9f9", borderBottom: "2px solid #ddd" }}>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Ingrediente</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Cantidad</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Unidad</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Precio Unit</th>
+          <tr style={{ background: "rgba(255, 248, 236, 0.72)", borderBottom: "2px solid var(--border-light)" }}>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Producto</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Ingrediente</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Cantidad</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Unidad</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Precio Unit</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item, idx) => (
             <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-              <td style={{ padding: 12, color: "#333", fontWeight: 600 }}>{item.producto}</td>
-              <td style={{ padding: 12, color: "#666" }}>{item.ingrediente}</td>
-              <td style={{ padding: 12, textAlign: "right", color: "#666" }}>{item.cantidad}</td>
-              <td style={{ padding: 12, color: "#666" }}>{item.unidad}</td>
-              <td style={{ padding: 12, textAlign: "right", color: "#293AFF", fontWeight: 600 }}>
+              <td style={{ padding: 12, color: "var(--text-primary)", fontWeight: 600 }}>{item.producto}</td>
+              <td style={{ padding: 12, color: "var(--text-secondary)" }}>{item.ingrediente}</td>
+              <td style={{ padding: 12, textAlign: "right", color: "var(--text-secondary)" }}>{item.cantidad}</td>
+              <td style={{ padding: 12, color: "var(--text-secondary)" }}>{item.unidad}</td>
+              <td style={{ padding: 12, textAlign: "right", color: "var(--primary)", fontWeight: 600 }}>
                 €{item.precio_unidad.toFixed(2)}
               </td>
             </tr>
@@ -1182,7 +1097,7 @@ function ProveedoresTab({
   stats: { proveedor: string; cif: string; email: string; telefono: string; direccion: string; gastoTotal: number; ultimaCompra: string | null }[] 
 }) {
   if (data.length === 0) {
-    return <div style={{ color: "#888", textAlign: "center", padding: 40 }}>No hay datos de proveedores</div>;
+    return <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 40 }}>No hay datos de proveedores</div>;
   }
 
   // Mapa de stats por proveedor
@@ -1210,26 +1125,26 @@ function ProveedoresTab({
   return (
     <div>
       {/* Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
-        <StatCard label="Total Proveedores" value={data.length.toString()} color="#008A0E" />
-        <StatCard label="Emails" value={data.filter((p) => p.email).length.toString()} color="#293AFF" />
-        <StatCard label="Gasto Total" value={`€${gastoTotalTodos.toFixed(2)}`} color="#293AFF" />
+      <div className="metric-grid metric-grid-3" style={{ marginBottom: 24 }}>
+        <StatCard label="Total Proveedores" value={data.length.toString()} color="var(--secondary)" />
+        <StatCard label="Emails" value={data.filter((p) => p.email).length.toString()} color="var(--primary)" />
+        <StatCard label="Gasto Total" value={`€${gastoTotalTodos.toFixed(2)}`} color="var(--primary)" />
       </div>
 
       {/* Último Pedido por Proveedor */}
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
         📦 Último Pedido por Proveedor
       </h3>
       <div style={{ overflowX: "auto", marginBottom: 24 }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
           <thead>
-            <tr style={{ background: "#f5f5f5" }}>
-              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>#</th>
-              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Proveedor</th>
-              <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>CIF</th>
-              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Email</th>
-              <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "#333" }}>Gasto Total</th>
-              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "#333" }}>Último Pedido</th>
+            <tr style={{ background: "rgba(255, 248, 236, 0.72)" }}>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>#</th>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Proveedor</th>
+              <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>CIF</th>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Email</th>
+              <th style={{ padding: "12px 16px", textAlign: "right", fontWeight: 600, color: "var(--text-primary)" }}>Gasto Total</th>
+              <th style={{ padding: "12px 16px", textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Último Pedido</th>
             </tr>
           </thead>
           <tbody>
@@ -1237,24 +1152,24 @@ function ProveedoresTab({
               <tr 
                 key={idx} 
                 style={{ 
-                  borderBottom: "1px solid #f0f0f0",
-                  background: idx % 2 === 0 ? "white" : "#fafafa",
+                  borderBottom: "1px solid rgba(56,41,31,0.08)",
+                  background: idx % 2 === 0 ? "rgba(255,252,246,0.94)" : "rgba(255,248,236,0.72)",
                 }}
               >
-                <td style={{ padding: "12px 16px", color: "#666" }}>{idx + 1}</td>
-                <td style={{ padding: "12px 16px", color: "#333", fontWeight: 600 }}>{item.proveedor}</td>
-                <td style={{ padding: "12px 16px", textAlign: "right", color: "#666" }}>{item.cif}</td>
-                <td style={{ padding: "12px 16px", color: "#0066cc" }}>
+                <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>{idx + 1}</td>
+                <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.proveedor}</td>
+                <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--text-secondary)" }}>{item.cif}</td>
+                <td style={{ padding: "12px 16px", color: "var(--primary)" }}>
                   {item.email ? (
                     <a href={`mailto:${item.email}`} style={{ textDecoration: "none" }}>
                       {item.email}
                     </a>
                   ) : "—"}
                 </td>
-                <td style={{ padding: "12px 16px", textAlign: "right", color: "#293AFF", fontWeight: 600 }}>
+                <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--primary)", fontWeight: 600 }}>
                   €{(item.gastoTotal || 0).toFixed(2)}
                 </td>
-                <td style={{ padding: "12px 16px", color: item.ultimaCompra ? "#333" : "#999" }}>
+                <td style={{ padding: "12px 16px", color: item.ultimaCompra ? "var(--text-primary)" : "var(--text-muted)" }}>
                   {item.ultimaCompra 
                     ? new Date(item.ultimaCompra).toLocaleDateString("es-ES", { year: "numeric", month: "short", day: "numeric" })
                     : "Sin pedidos"}
@@ -1266,7 +1181,7 @@ function ProveedoresTab({
       </div>
 
       {/* Listado Completo */}
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
+      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
         📋 Listado de Proveedores
       </h3>
       <table
@@ -1277,26 +1192,26 @@ function ProveedoresTab({
         }}
       >
         <thead>
-          <tr style={{ background: "#f9f9f9", borderBottom: "2px solid #ddd" }}>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Proveedor</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>CIF</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Email</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Teléfono</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Dirección</th>
+          <tr style={{ background: "rgba(255, 248, 236, 0.72)", borderBottom: "2px solid var(--border-light)" }}>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Proveedor</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>CIF</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Email</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Teléfono</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-primary)" }}>Dirección</th>
           </tr>
         </thead>
         <tbody>
           {data.map((proveedor, idx) => (
             <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-              <td style={{ padding: 12, color: "#333", fontWeight: 600 }}>{proveedor.proveedor}</td>
-              <td style={{ padding: 12, color: "#666" }}>{proveedor.cif}</td>
-              <td style={{ padding: 12, color: "#0066cc" }}>
+              <td style={{ padding: 12, color: "var(--text-primary)", fontWeight: 600 }}>{proveedor.proveedor}</td>
+              <td style={{ padding: 12, color: "var(--text-secondary)" }}>{proveedor.cif}</td>
+              <td style={{ padding: 12, color: "var(--primary)" }}>
                 <a href={`mailto:${proveedor.email}`} style={{ textDecoration: "none" }}>
                   {proveedor.email}
                 </a>
               </td>
-              <td style={{ padding: 12, color: "#666" }}>{proveedor.telefono}</td>
-              <td style={{ padding: 12, color: "#666", fontSize: 13 }}>{proveedor.direccion}</td>
+              <td style={{ padding: 12, color: "var(--text-secondary)" }}>{proveedor.telefono}</td>
+              <td style={{ padding: 12, color: "var(--text-secondary)", fontSize: 13 }}>{proveedor.direccion}</td>
             </tr>
           ))}
         </tbody>
@@ -1307,28 +1222,33 @@ function ProveedoresTab({
 
 // ===== STAT CARD COMPONENT =====
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
-  const bgColor = color === "var(--secondary)" ? "rgba(37, 78, 75, 0.1)" : color === "var(--accent)" ? "rgba(230,177,93,0.14)" : "rgba(188, 75, 47, 0.1)";
+  const bgColor = color === "var(--secondary)"
+    ? "rgba(31, 91, 87, 0.10)"
+    : color === "var(--accent)"
+      ? "rgba(197, 139, 40, 0.14)"
+      : "rgba(194, 76, 42, 0.10)";
   return (
     <div
       style={{
         background: bgColor,
-        border: `2px solid ${color}`,
-        borderRadius: 12,
-        padding: 20,
+        border: `1.5px solid ${color}`,
+        borderRadius: 16,
+        padding: 22,
         textAlign: "center",
-        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+        boxShadow: "0 10px 28px rgba(36,24,20,0.06)",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = `0 4px 12px ${color}30`;
+        e.currentTarget.style.boxShadow = `0 16px 36px ${color}20`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.boxShadow = "0 10px 28px rgba(36,24,20,0.06)";
       }}
     >
       <div style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 8, fontWeight: 500 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color }}>{value}</div>
+      <div style={{ fontSize: 30, fontWeight: 700, color }}>{value}</div>
     </div>
   );
 }
@@ -1392,17 +1312,17 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
       {selectedData && (
         <div>
             {selectedData.costo === 0 && (
-            <div style={{ background: "rgba(230,177,93,0.14)", border: "1px solid rgba(230,177,93,0.3)", borderRadius: 8, padding: 12, marginBottom: 16, color: "#8A5E12" }}>
+            <div style={{ background: "rgba(197,139,40,0.14)", border: "1px solid rgba(197,139,40,0.3)", borderRadius: 12, padding: 12, marginBottom: 16, color: "#6F4C10" }}>
               ⚠️ <strong>{selectedData.producto}</strong> no tiene datos de escandallo. El margen mostrado no es real (costo = €0).
               <br />Sube un archivo de escandallo con este producto para ver márgenes reales.
             </div>
           )}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 20 }}>
-            <div style={{ background: "rgba(37,78,75,0.1)", padding: 16, borderRadius: 8 }}>
+            <div className="metric-grid metric-grid-4" style={{ marginBottom: 20 }}>
+            <div style={{ background: "rgba(31,91,87,0.10)", padding: 16, borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Precio Actual</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: "var(--secondary)" }}>€{selectedData.precioVenta.toFixed(2)}</div>
             </div>
-            <div style={{ background: newPrice > 0 ? "rgba(188,75,47,0.1)" : "rgba(188,75,47,0.08)", padding: 16, borderRadius: 8 }}>
+            <div style={{ background: newPrice > 0 ? "rgba(194,76,42,0.10)" : "rgba(194,76,42,0.08)", padding: 16, borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Nuevo Precio</div>
               {newPrice > 0 ? (
                 <div style={{ fontSize: 24, fontWeight: 700, color: "var(--primary)" }}>€{newPrice.toFixed(2)}</div>
@@ -1410,11 +1330,11 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
                 <div style={{ fontSize: 16, fontWeight: 700, color: "var(--primary)" }}>Precio inválido (≤ €0)</div>
               )}
             </div>
-            <div style={{ background: "rgba(37,78,75,0.1)", padding: 16, borderRadius: 8 }}>
+            <div style={{ background: "rgba(31,91,87,0.10)", padding: 16, borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Margen Actual</div>
               <div style={{ fontSize: 24, fontWeight: 700, color: "var(--secondary)" }}>{selectedData.margen.toFixed(1)}%</div>
             </div>
-            <div style={{ background: `${newPrice > 0 ? (newMargen >= 30 ? "rgba(0, 138, 14, 0.1)" : newMargen >= 15 ? "rgba(255, 165, 0, 0.1)" : "rgba(255, 68, 68, 0.1)") : "#fdd"}`, padding: 16, borderRadius: 8 }}>
+            <div style={{ background: `${newPrice > 0 ? (newMargen >= 30 ? "rgba(31, 91, 87, 0.10)" : newMargen >= 15 ? "rgba(197, 139, 40, 0.12)" : "rgba(194, 76, 42, 0.10)") : "rgba(194, 76, 42, 0.08)"}`, padding: 16, borderRadius: 12 }}>
               <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Nuevo Margen</div>
               {newPrice > 0 ? (
                 <div style={{ fontSize: 24, fontWeight: 700, color: margenColor }}>{newMargen.toFixed(1)}%</div>

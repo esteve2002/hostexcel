@@ -14,10 +14,10 @@ interface Upload {
 }
 
 const TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  ventas: { label: "Ventas", icon: "📈", color: "#008A0E" },
-  inventario: { label: "Inventario", icon: "📦", color: "#293AFF" },
-  escandallo: { label: "Escandallo", icon: "🔄", color: "#008A0E" },
-  proveedores: { label: "Proveedores", icon: "🏢", color: "#293AFF" },
+   ventas: { label: "Ventas", icon: "📈", color: "var(--secondary)" },
+   inventario: { label: "Inventario", icon: "📦", color: "var(--primary)" },
+   escandallo: { label: "Escandallo", icon: "🔄", color: "var(--secondary)" },
+   proveedores: { label: "Proveedores", icon: "🏢", color: "var(--primary)" },
 };
 
 export default function HistorialPage() {
@@ -144,13 +144,13 @@ export default function HistorialPage() {
           <div style={{
             width: 64,
             height: 64,
-            border: "4px solid #E0E0E0",
-            borderTopColor: "#008A0E",
+            border: "4px solid var(--border-light)",
+            borderTopColor: "var(--secondary)",
             borderRadius: "50%",
             animation: "spin 1s linear infinite",
             margin: "0 auto 20px",
           }}></div>
-          <p style={{ color: "#666", fontSize: 16, margin: 0 }}>Cargando historial...</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 16, margin: 0 }}>Cargando historial...</p>
         </div>
       </div>
     );
@@ -367,14 +367,14 @@ export default function HistorialPage() {
                         key={upload.id}
                         style={{
                           borderBottom: "1px solid #f0f0f0",
-                          background: index % 2 === 0 ? "white" : "#fafafa",
+                        background: index % 2 === 0 ? "rgba(255,252,246,0.9)" : "rgba(255,248,236,0.7)",
                           transition: "all 0.2s ease",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "rgba(0, 138, 14, 0.05)";
+                          e.currentTarget.style.background = "rgba(37,78,75,0.06)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = index % 2 === 0 ? "white" : "#fafafa";
+                          e.currentTarget.style.background = index % 2 === 0 ? "rgba(255,252,246,0.9)" : "rgba(255,248,236,0.7)";
                         }}
                       >
                         <td style={{ padding: "16px 20px", fontSize: 14, color: "#333", fontWeight: 500 }}>
@@ -398,7 +398,7 @@ export default function HistorialPage() {
                             {typeConfig.icon} {typeConfig.label}
                           </span>
                         </td>
-                        <td style={{ padding: "16px 20px", fontSize: 14, color: "#666" }}>
+                          <td style={{ padding: "16px 20px", fontSize: 14, color: "var(--text-secondary)" }}>
                           {new Date(upload.uploaded_at).toLocaleDateString("es-ES", {
                             year: "numeric",
                             month: "short",

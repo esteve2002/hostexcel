@@ -507,10 +507,10 @@ export default function VisualizarPage() {
           <div>
             {/* Stats Cards */}
             <div className="metric-grid metric-grid-4">
-              <StatCard label="Margen Bruto Total" value={`€${margenBrutoTotal.toFixed(2)}`} color="#008A0E" />
-              <StatCard label="Ticket Medio" value={`€${ticketMedio.toFixed(2)}`} color="#293AFF" />
-              <StatCard label="Total Ventas" value={(weekFilter === "all" ? ventas : filteredVentas).reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0).toFixed(2)} color="#008A0E" />
-              <StatCard label="Nº Productos" value={new Set((weekFilter === "all" ? ventas : filteredVentas).map(v => v.producto)).size.toString()} color="#293AFF" />
+              <StatCard label="Margen Bruto Total" value={`€${margenBrutoTotal.toFixed(2)}`} color="var(--secondary)" />
+              <StatCard label="Ticket Medio" value={`€${ticketMedio.toFixed(2)}`} color="var(--primary)" />
+              <StatCard label="Total Ventas" value={(weekFilter === "all" ? ventas : filteredVentas).reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0).toFixed(2)} color="var(--secondary)" />
+              <StatCard label="Nº Productos" value={new Set((weekFilter === "all" ? ventas : filteredVentas).map(v => v.producto)).size.toString()} color="var(--primary)" />
             </div>
 
             {/* Comparativa Semanal */}
@@ -554,7 +554,7 @@ export default function VisualizarPage() {
               </div>
               <div>
                 {/* Evolución de Ventas */}
-                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
+                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
                   📈 Evolución de Ventas
                 </h3>
                 <div style={{ marginBottom: 16 }}>
@@ -577,13 +577,13 @@ export default function VisualizarPage() {
                       <XAxis dataKey="week" />
                       <YAxis />
                       <Tooltip formatter={(value) => `€${Number(value).toFixed(2)}`} />
-                      <Bar dataKey="total" fill="#008A0E" name="Total Ventas" />
+                      <Bar dataKey="total" fill="var(--secondary)" name="Total Ventas" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
 
                 {/* Ventas por día de la semana */}
-                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e", marginTop: 32 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)", marginTop: 32 }}>
                   📅 Ventas por Día de la Semana
                 </h3>
                 <div style={{ width: "100%", height: 300 }}>
@@ -593,7 +593,7 @@ export default function VisualizarPage() {
                       <XAxis dataKey="day" />
                       <YAxis />
                       <Tooltip formatter={(value) => `€${Number(value).toFixed(2)}`} />
-                      <Bar dataKey="total" fill="#293AFF" name="Total Ventas" />
+                      <Bar dataKey="total" fill="var(--primary)" name="Total Ventas" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -602,7 +602,7 @@ export default function VisualizarPage() {
 
             {/* Top 3 Platos Más Vendidos */}
             <div style={{ marginTop: 32 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "#1a1a2e" }}>
+              <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)" }}>
                 🏆 Top 3 Platos Más Vendidos
               </h3>
               {top3ProductosVendidos.length > 0 ? (
@@ -613,8 +613,8 @@ export default function VisualizarPage() {
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
                       <div
                         style={{
-                          background: "#E0E0E0",
-                          color: "#333",
+                           background: "rgba(255,248,236,0.92)",
+                           color: "var(--text-primary)",
                           padding: "12px 8px",
                           borderRadius: "8px 8px 0 0",
                           height: 80,
@@ -628,7 +628,7 @@ export default function VisualizarPage() {
                         {top3ProductosVendidos[1].producto}
                         <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[1].total.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "#008A0E", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                       <div style={{ background: "var(--secondary)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
                         2°
                       </div>
                     </div>
@@ -640,7 +640,7 @@ export default function VisualizarPage() {
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
                       <div
                         style={{
-                          background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+                          background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
                           color: "white",
                           padding: "16px 8px",
                           borderRadius: "8px 8px 0 0",
@@ -656,7 +656,7 @@ export default function VisualizarPage() {
                         {top3ProductosVendidos[0].producto}
                         <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[0].total.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                       <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
                         1°
                       </div>
                     </div>
@@ -668,7 +668,7 @@ export default function VisualizarPage() {
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
                       <div
                         style={{
-                          background: "#293AFF",
+                          background: "var(--primary)",
                           color: "white",
                           padding: "10px 8px",
                           borderRadius: "8px 8px 0 0",
@@ -683,14 +683,14 @@ export default function VisualizarPage() {
                         {top3ProductosVendidos[2].producto}
                         <span style={{ fontSize: 12, opacity: 0.9 }}>€{top3ProductosVendidos[2].total.toFixed(2)}</span>
                       </div>
-                      <div style={{ background: "#293AFF", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
+                       <div style={{ background: "var(--primary)", color: "white", padding: "4px", borderRadius: "0 0 8px 8px", fontWeight: 700 }}>
                         3°
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <div style={{ color: "#888", textAlign: "center", padding: 20 }}>
+                <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 20 }}>
                   No hay datos suficientes
                 </div>
               )}
@@ -830,9 +830,9 @@ function VentasTab({ data }: { data: Venta[] }) {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <StatCard label="Total Ventas" value={totalVentas.toFixed(2)} color="#008A0E" />
-        <StatCard label="Cantidad Promedio" value={cantidadPromedio} color="#293AFF" />
-        <StatCard label="Productos Vendidos" value={productos.toString()} color="#008A0E" />
+              <StatCard label="Total Ventas" value={totalVentas.toFixed(2)} color="var(--secondary)" />
+              <StatCard label="Cantidad Promedio" value={cantidadPromedio} color="var(--primary)" />
+              <StatCard label="Productos Vendidos" value={productos.toString()} color="var(--secondary)" />
       </div>
 
       <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
@@ -1307,7 +1307,7 @@ function ProveedoresTab({
 
 // ===== STAT CARD COMPONENT =====
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
-  const bgColor = color === "#008A0E" ? "rgba(0, 138, 14, 0.1)" : "rgba(41, 58, 255, 0.1)";
+  const bgColor = color === "var(--secondary)" ? "rgba(37, 78, 75, 0.1)" : color === "var(--accent)" ? "rgba(230,177,93,0.14)" : "rgba(188, 75, 47, 0.1)";
   return (
     <div
       style={{
@@ -1327,7 +1327,7 @@ function StatCard({ label, value, color }: { label: string; value: string; color
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 8, fontWeight: 500 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 700, color }}>{value}</div>
     </div>
   );
@@ -1345,20 +1345,21 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
     (newPrice - selectedData.costo) / newPrice
   ) * 100 : 0;
   
-  const margenColor = newMargen >= 30 ? "#008A0E" : newMargen >= 15 ? "#FFA500" : "#f44";
+  const margenColor = newMargen >= 30 ? "var(--secondary)" : newMargen >= 15 ? "var(--accent)" : "var(--primary)";
   
   return (
-    <div style={{ background: "white", borderRadius: 12, padding: 24, border: "1px solid #e0e0e0", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+    <div className="section-card section-card--pad">
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
         <div>
-          <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "#333" }}>Selecciona un plato:</label>
+          <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text-secondary)" }}>Selecciona un plato:</label>
           <select
             value={selectedProducto}
             onChange={(e) => {
               setSelectedProducto(e.target.value);
               setPriceChange(0);
             }}
-            style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "2px solid #e0e0e0", fontSize: 14 }}
+            className="input-field"
+            style={{ marginTop: 0 }}
           >
             <option value="">-- Elige un plato --</option>
             {rentabilidad.map((r, i) => (
@@ -1368,7 +1369,7 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
         </div>
         
         <div>
-          <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "#333" }}>
+          <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text-secondary)" }}>
             {priceChange >= 0 ? "📈 Subir" : "📉 Bajar"} precio en:
           </label>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -1381,7 +1382,7 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
               onChange={(e) => setPriceChange(parseFloat(e.target.value))}
               style={{ flex: 1 }}
             />
-            <span style={{ fontWeight: 700, color: priceChange >= 0 ? "#008A0E" : "#f44", minWidth: 60, textAlign: "right" }}>
+            <span style={{ fontWeight: 700, color: priceChange >= 0 ? "var(--secondary)" : "var(--primary)", minWidth: 60, textAlign: "right" }}>
               {priceChange >= 0 ? "+" : ""}{priceChange.toFixed(1)}€
             </span>
           </div>
@@ -1390,58 +1391,58 @@ function SimuladorPrecio({ rentabilidad }: { rentabilidad: { producto: string; p
 
       {selectedData && (
         <div>
-          {selectedData.costo === 0 && (
-            <div style={{ background: "#fff3cd", border: "1px solid #ffecb5", borderRadius: 8, padding: 12, marginBottom: 16, color: "#856404" }}>
+            {selectedData.costo === 0 && (
+            <div style={{ background: "rgba(230,177,93,0.14)", border: "1px solid rgba(230,177,93,0.3)", borderRadius: 8, padding: 12, marginBottom: 16, color: "#8A5E12" }}>
               ⚠️ <strong>{selectedData.producto}</strong> no tiene datos de escandallo. El margen mostrado no es real (costo = €0).
               <br />Sube un archivo de escandallo con este producto para ver márgenes reales.
             </div>
           )}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 20 }}>
-            <div style={{ background: "rgba(0, 138, 14, 0.1)", padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>Precio Actual</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#008A0E" }}>€{selectedData.precioVenta.toFixed(2)}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 20 }}>
+            <div style={{ background: "rgba(37,78,75,0.1)", padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Precio Actual</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "var(--secondary)" }}>€{selectedData.precioVenta.toFixed(2)}</div>
             </div>
-            <div style={{ background: newPrice > 0 ? "rgba(41, 58, 255, 0.1)" : "#fdd", padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>Nuevo Precio</div>
+            <div style={{ background: newPrice > 0 ? "rgba(188,75,47,0.1)" : "rgba(188,75,47,0.08)", padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Nuevo Precio</div>
               {newPrice > 0 ? (
-                <div style={{ fontSize: 24, fontWeight: 700, color: "#293AFF" }}>€{newPrice.toFixed(2)}</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: "var(--primary)" }}>€{newPrice.toFixed(2)}</div>
               ) : (
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#f44" }}>Precio inválido (≤ €0)</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "var(--primary)" }}>Precio inválido (≤ €0)</div>
               )}
             </div>
-            <div style={{ background: "rgba(0, 138, 14, 0.1)", padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>Margen Actual</div>
-              <div style={{ fontSize: 24, fontWeight: 700, color: "#008A0E" }}>{selectedData.margen.toFixed(1)}%</div>
+            <div style={{ background: "rgba(37,78,75,0.1)", padding: 16, borderRadius: 8 }}>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Margen Actual</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: "var(--secondary)" }}>{selectedData.margen.toFixed(1)}%</div>
             </div>
             <div style={{ background: `${newPrice > 0 ? (newMargen >= 30 ? "rgba(0, 138, 14, 0.1)" : newMargen >= 15 ? "rgba(255, 165, 0, 0.1)" : "rgba(255, 68, 68, 0.1)") : "#fdd"}`, padding: 16, borderRadius: 8 }}>
-              <div style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>Nuevo Margen</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Nuevo Margen</div>
               {newPrice > 0 ? (
                 <div style={{ fontSize: 24, fontWeight: 700, color: margenColor }}>{newMargen.toFixed(1)}%</div>
               ) : (
-                <div style={{ fontSize: 16, fontWeight: 700, color: "#f44" }}>N/A</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "var(--primary)" }}>N/A</div>
               )}
             </div>
           </div>
 
           {newPrice > 0 && selectedData.costo > 0 && (
-            <div style={{ background: "linear-gradient(135deg, rgba(0, 138, 14, 0.05) 0%, rgba(41, 58, 255, 0.05) 100%)", borderRadius: 12, padding: 20 }}>
-              <p style={{ margin: "0 0 12px 0", fontSize: 14, color: "#666" }}>
+            <div style={{ background: "linear-gradient(135deg, rgba(255,248,236,0.9) 0%, rgba(255,252,246,0.9) 100%)", borderRadius: 12, padding: 20 }}>
+              <p style={{ margin: "0 0 12px 0", fontSize: 14, color: "var(--text-secondary)" }}>
                 {priceChange >= 0 ? (
                   <>📈 Si subes <strong>{selectedData.producto}</strong> de <strong>€{selectedData.precioVenta.toFixed(2)}</strong> a <strong>€{newPrice.toFixed(2)}</strong>, tu margen pasa de <strong>{selectedData.margen.toFixed(1)}%</strong> a <strong style={{ color: margenColor }}>{newMargen.toFixed(1)}%</strong></>
                 ) : (
                   <>📉 Si bajas <strong>{selectedData.producto}</strong> de <strong>€{selectedData.precioVenta.toFixed(2)}</strong> a <strong>€{newPrice.toFixed(2)}</strong>, tu margen baja de <strong>{selectedData.margen.toFixed(1)}%</strong> a <strong style={{ color: margenColor }}>{newMargen.toFixed(1)}%</strong></>
                 )}
               </p>
-            <div style={{ height: 8, background: "#e0e0e0", borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ height: 8, background: "rgba(80,55,42,0.12)", borderRadius: 4, overflow: "hidden" }}>
               <div style={{ 
                 width: `${Math.min(selectedData.margen, 100)}%`, 
                 height: "100%", 
-                background: selectedData.margen >= 30 ? "#008A0E" : selectedData.margen >= 15 ? "#FFA500" : "#f44",
+                background: selectedData.margen >= 30 ? "var(--secondary)" : selectedData.margen >= 15 ? "var(--accent)" : "var(--primary)",
                 borderRadius: 4,
                 transition: "all 0.3s ease"
               }}></div>
             </div>
-             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 12, color: "#666" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 12, color: "var(--text-muted)" }}>
                <span>0%</span>
                <span>30% (Objetivo)</span>
                <span>50%+</span>

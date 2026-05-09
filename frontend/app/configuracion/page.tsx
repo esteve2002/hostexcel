@@ -265,7 +265,7 @@ export default function ConfiguracionPage() {
             justifyContent: "center",
             width: 48,
             height: 48,
-            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+            background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
             borderRadius: 12,
             fontSize: 24,
             boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)"
@@ -278,8 +278,8 @@ export default function ConfiguracionPage() {
 
       {error && (
         <div style={{
-          marginBottom: 24, padding: "16px 20px", background: "#fff0f0",
-          border: "1px solid #f5c6c6", borderRadius: 12, color: "#c0392b", fontSize: 14,
+          marginBottom: 24, padding: "16px 20px", background: "rgba(188,75,47,0.08)",
+          border: "1px solid rgba(188,75,47,0.18)", borderRadius: 12, color: "var(--primary)", fontSize: 14,
         }}>
           ❌ {error}
         </div>
@@ -287,8 +287,8 @@ export default function ConfiguracionPage() {
 
       {success && (
         <div style={{
-          marginBottom: 24, padding: "16px 20px", background: "rgba(0, 138, 14, 0.1)",
-          border: "1px solid #008A0E", borderRadius: 12, color: "#008A0E", fontSize: 14, fontWeight: 600,
+          marginBottom: 24, padding: "16px 20px", background: "rgba(37,78,75,0.1)",
+          border: "1px solid var(--secondary)", borderRadius: 12, color: "var(--secondary)", fontSize: 14, fontWeight: 600,
         }}>
           ✅ {success}
         </div>
@@ -394,7 +394,7 @@ export default function ConfiguracionPage() {
                     borderBottom: idx < mappings.length - 1 ? "1px solid rgba(80,55,42,0.08)" : "none",
                     transition: "background 0.2s ease",
                   }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "#fafafa"; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,248,236,0.7)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                   >
                     <div style={{
@@ -448,7 +448,7 @@ export default function ConfiguracionPage() {
 
           {/* TPV Presets */}
           <div className="section-card section-card--pad stack-lg">
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
               🏪 Presets para {EXCEL_TYPE_LABELS[activeType]}
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>
@@ -490,7 +490,7 @@ export default function ConfiguracionPage() {
 
       {activeTab === 'tester' && (
         <div className="section-card section-card--pad stack-lg">
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
             🧪 Probador de mappings
           </h2>
             <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>
@@ -542,7 +542,7 @@ export default function ConfiguracionPage() {
             />
           </div>
 
-          {testLoading && <p style={{ color: "#888", textAlign: "center" }}>Analizando archivo...</p>}
+          {testLoading && <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Analizando archivo...</p>}
 
           {testResult && (
             <div>
@@ -584,7 +584,7 @@ export default function ConfiguracionPage() {
                           </td>
                           <td style={{
                             padding: "10px 12px",
-                            color: changed ? "#008A0E" : "#999",
+                            color: changed ? "var(--secondary)" : "var(--text-muted)",
                             fontWeight: changed ? 600 : 400,
                           }}>
                             {after}
@@ -596,7 +596,7 @@ export default function ConfiguracionPage() {
                           </td>
                           <td style={{ padding: "10px 12px", textAlign: "center" }}>
                             {changed ? (
-                              <span style={{ color: "#008A0E", fontSize: 16 }}>✓</span>
+                              <span style={{ color: "var(--secondary)", fontSize: 16 }}>✓</span>
                             ) : (
                               <span style={{ color: "#ccc", fontSize: 12 }}>—</span>
                             )}
@@ -629,7 +629,7 @@ export default function ConfiguracionPage() {
 
       {activeTab === 'account' && (
         <div className="section-card section-card--pad stack-lg">
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
             👤 Mi cuenta
           </h2>
 
@@ -644,26 +644,26 @@ export default function ConfiguracionPage() {
                 </p>
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
                   Email
                 </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "#1a1a2e" }}>
+                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
                   {userData?.email || '—'}
                 </p>
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
                   Plan
                 </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "#1a1a2e" }}>
+                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
                   {userData?.plan || 'Gratuito'}
                 </p>
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
                   Miembro desde
                 </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "#1a1a2e" }}>
+                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
                   {userData?.created_at ? new Date(userData.created_at).toLocaleDateString('es-ES') : '—'}
                 </p>
               </div>

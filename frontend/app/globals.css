@@ -449,6 +449,82 @@ input, select, textarea {
   color: var(--text-muted);
 }
 
+/* Legacy palette overrides inside internal surfaces */
+.section-card [style*="#008A0E"],
+.page-hero [style*="#008A0E"],
+.card [style*="#008A0E"] {
+  color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  fill: var(--secondary) !important;
+  stroke: var(--secondary) !important;
+}
+
+.section-card [style*="#293AFF"],
+.page-hero [style*="#293AFF"],
+.card [style*="#293AFF"] {
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  fill: var(--primary) !important;
+  stroke: var(--primary) !important;
+}
+
+.section-card [style*="#1a1a2e"],
+.page-hero [style*="#1a1a2e"],
+.card [style*="#1a1a2e"] {
+  color: var(--text-primary) !important;
+}
+
+.section-card [style*="#666"],
+.page-hero [style*="#666"],
+.card [style*="#666"],
+.section-card [style*="#888"],
+.page-hero [style*="#888"],
+.card [style*="#888"],
+.section-card [style*="#999"],
+.page-hero [style*="#999"],
+.card [style*="#999"] {
+  color: var(--text-muted) !important;
+}
+
+.section-card [style*="#f44"],
+.page-hero [style*="#f44"],
+.card [style*="#f44"],
+.section-card [style*="#c0392b"],
+.page-hero [style*="#c0392b"],
+.card [style*="#c0392b"] {
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  fill: var(--primary) !important;
+  stroke: var(--primary) !important;
+}
+
+.section-card [style*="#E0E0E0"],
+.section-card [style*="#e0e0e0"],
+.section-card [style*="#fafafa"],
+.section-card [style*="white"],
+.page-hero [style*="#E0E0E0"],
+.page-hero [style*="#e0e0e0"],
+.page-hero [style*="#fafafa"],
+.page-hero [style*="white"] {
+  background-color: rgba(255, 252, 246, 0.92) !important;
+}
+
+.section-card [fill="#008A0E"],
+.section-card [stroke="#008A0E"],
+.page-shell [fill="#008A0E"],
+.page-shell [stroke="#008A0E"] {
+  fill: var(--secondary) !important;
+  stroke: var(--secondary) !important;
+}
+
+.section-card [fill="#293AFF"],
+.section-card [stroke="#293AFF"],
+.page-shell [fill="#293AFF"],
+.page-shell [stroke="#293AFF"] {
+  fill: var(--primary) !important;
+  stroke: var(--primary) !important;
+}
+
 .section-card--pad {
   padding: 24px;
 }

@@ -157,206 +157,77 @@ export default function HistorialPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#FAFAFA",
-        padding: "24px",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-        }}
-      >
-        {/* Header con gradiente */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a1a2e 0%, #2d3748 100%)",
-            borderRadius: 16,
-            padding: "32px 40px",
-            marginBottom: 32,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-          }}
-        >
+    <div className="page-shell-compact stack-lg">
+      <div className="page-hero" style={{ marginBottom: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <div>
-            <h1 style={{ 
-              fontSize: 32, 
-              fontWeight: 700, 
-              color: "white", 
-              margin: 0, 
-              display: "flex", 
-              alignItems: "center", 
-              gap: 12 
-            }}>
+            <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--text-primary)" }}>
               <span style={{ 
                 fontSize: 36,
-                background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "var(--primary)",
               }}>📋</span>
               Historial de Subidas
             </h1>
-            <p style={{ color: "#b0b0b0", fontSize: 14, margin: "8px 0 0 48px" }}>
+            <p className="page-subtitle" style={{ marginLeft: 48 }}>
               Gestiona y revisa todas tus subidas de archivos Excel
             </p>
           </div>
           <button
             onClick={() => router.push("/")}
-            style={{
-              padding: "12px 24px",
-              background: "rgba(255,255,255,0.1)",
-              color: "white",
-              border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              backdropFilter: "blur(10px)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(0, 138, 14, 0.2)";
-              e.currentTarget.style.borderColor = "#008A0E";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
-            }}
+            className="ghost-button"
           >
             ← Volver
           </button>
         </div>
 
         {error && (
-          <div
-            style={{
-              background: "#fff0f0",
-              border: "1px solid #f5c6c6",
-              borderRadius: 12,
-              padding: "16px 20px",
-              marginBottom: 24,
-              color: "#c0392b",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-            }}
-          >
+          <div className="section-card section-card--pad" style={{ marginBottom: 0, color: "var(--primary)", display: "flex", alignItems: "center", gap: 12, background: "rgba(188,75,47,0.08)" }}>
             <span style={{ fontSize: 24 }}>❌</span>
             <span style={{ fontWeight: 500 }}>{error}</span>
           </div>
         )}
 
         {/* Stats Cards */}
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(3, 1fr)", 
-          gap: 20, 
-          marginBottom: 32 
-        }}>
-          <div style={{
-            background: "white",
-            borderRadius: 12,
-            padding: "24px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-            border: "1px solid #e0e0e0",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 4px 20px rgba(0, 138, 14, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
-          >
-            <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500 }}>Total Subidas</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#1a1a2e" }}>{stats.total}</div>
+        <div className="metric-grid metric-grid-3">
+          <div className="section-card section-card--pad metric-card">
+            <div className="metric-card__label">Total Subidas</div>
+            <div className="metric-card__value" style={{ fontSize: 32 }}>{stats.total}</div>
           </div>
 
-          <div style={{
-            background: "white",
-            borderRadius: 12,
-            padding: "24px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-            border: "1px solid #e0e0e0",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 4px 20px rgba(0, 138, 14, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
+          <div className="section-card section-card--pad metric-card"
           >
-            <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500 }}>Exitosas</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#008A0E" }}>{stats.successful}</div>
+            <div className="metric-card__label">Exitosas</div>
+            <div className="metric-card__value" style={{ fontSize: 32, color: "var(--secondary)" }}>{stats.successful}</div>
           </div>
 
-          <div style={{
-            background: "white",
-            borderRadius: 12,
-            padding: "24px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-            border: "1px solid #e0e0e0",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 4px 20px rgba(41, 58, 255, 0.15)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-          }}
+          <div className="section-card section-card--pad metric-card"
           >
-            <div style={{ fontSize: 14, color: "#666", marginBottom: 8, fontWeight: 500 }}>Fallidas</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#293AFF" }}>{stats.failed}</div>
+            <div className="metric-card__label">Fallidas</div>
+            <div className="metric-card__value" style={{ fontSize: 32, color: "var(--primary)" }}>{stats.failed}</div>
           </div>
         </div>
 
         {/* Filtros */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            padding: "28px 32px",
-            marginBottom: 32,
-            boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            border: "1px solid #e0e0e0",
-          }}
-        >
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="section-card section-card--pad stack-lg">
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 0, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 20 }}>🔍</span>
             Filtros
           </h2>
 
           {/* Filtro por tipo */}
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 12, color: "#333" }}>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 12, color: "var(--text-secondary)" }}>
               Tipo de Excel:
             </label>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               {Object.entries(TYPE_LABELS).map(([type, config]) => (
                 <label
                   key={type}
+                  className="filter-chip"
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
                     cursor: "pointer",
-                    padding: "10px 18px",
-                    borderRadius: 8,
-                    border: `2px solid ${selectedTypes.includes(type) ? config.color : "#e0e0e0"}`,
-                    background: selectedTypes.includes(type) ? `${config.color}15` : "white",
-                    transition: "all 0.2s ease",
+                    borderColor: selectedTypes.includes(type) ? config.color : "var(--border-light)",
+                    background: selectedTypes.includes(type) ? `${config.color}12` : undefined,
                     fontWeight: selectedTypes.includes(type) ? 600 : 400,
                   }}
                   onMouseEnter={(e) => {
@@ -386,45 +257,31 @@ export default function HistorialPage() {
           </div>
 
           {/* Filtro por fecha */}
-          <div style={{ display: "flex", gap: 24, marginBottom: 24, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "#333" }}>
+            <div style={{ display: "flex", gap: 24, marginBottom: 24, flexWrap: "wrap" }}>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text-secondary)" }}>
                 📅 Desde:
               </label>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  boxSizing: "border-box",
-                  transition: "all 0.2s ease",
-                }}
+                  className="input-field"
+                  style={{ marginTop: 0 }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = "#008A0E"; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = "#e0e0e0"; }}
               />
             </div>
             <div style={{ flex: 1, minWidth: 200 }}>
-              <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "#333" }}>
+                <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 8, color: "var(--text-secondary)" }}>
                 📅 Hasta:
               </label>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  boxSizing: "border-box",
-                  transition: "all 0.2s ease",
-                }}
+                  className="input-field"
+                  style={{ marginTop: 0 }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = "#293AFF"; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = "#e0e0e0"; }}
               />
@@ -461,35 +318,21 @@ export default function HistorialPage() {
         </div>
 
         {/* Tabla de resultados */}
-        <div
-          style={{
-            background: "white",
-            borderRadius: 16,
-            overflow: "hidden",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-            border: "1px solid #e0e0e0",
-          }}
-        >
-          <div style={{ padding: "20px 24px", borderBottom: "1px solid #e0e0e0", background: "#fafafa" }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="section-card" style={{ overflow: "hidden" }}>
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border-light)", background: "rgba(255,248,236,0.7)" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 20 }}>📊</span>
               Resultados ({filteredUploads.length})
             </h2>
           </div>
 
           {filteredUploads.length === 0 ? (
-            <div
-              style={{
-                padding: "60px 40px",
-                textAlign: "center",
-                color: "#888",
-              }}
-            >
-              <div style={{ fontSize: 64, marginBottom: 16, opacity: 0.5 }}>📭</div>
-              <p style={{ fontSize: 16, margin: 0, fontWeight: 500 }}>
-                {uploads.length === 0
-                  ? "No hay subidas registradas"
-                  : "No hay subidas que coincidan con los filtros"}
+              <div className="subtle-list" style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 64, marginBottom: 16, opacity: 0.5 }}>📭</div>
+                <p style={{ fontSize: 16, margin: 0, fontWeight: 500, color: "var(--text-secondary)" }}>
+                  {uploads.length === 0
+                    ? "No hay subidas registradas"
+                    : "No hay subidas que coincidan con los filtros"}
               </p>
             </div>
           ) : (
@@ -501,17 +344,17 @@ export default function HistorialPage() {
                 }}
               >
                 <thead>
-                  <tr style={{ background: "#f5f5f5" }}>
-                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  <tr style={{ background: "rgba(255,248,236,0.7)" }}>
+                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Archivo
                     </th>
-                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Tipo
                     </th>
-                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Fecha
                     </th>
-                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    <th style={{ padding: "16px 20px", textAlign: "left", fontSize: 13, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                       Estado
                     </th>
                   </tr>
@@ -547,8 +390,8 @@ export default function HistorialPage() {
                             gap: 6,
                             padding: "6px 12px",
                             borderRadius: 6,
-                            background: `${typeConfig.color}15`,
-                            color: typeConfig.color,
+                          background: `${typeConfig.color}15`,
+                          color: typeConfig.color,
                             fontWeight: 600,
                             fontSize: 13,
                           }}>
@@ -578,11 +421,11 @@ export default function HistorialPage() {
                                   display: "inline-block",
                                   width: 10,
                                   height: 10,
-                                  background: "#008A0E",
+                                background: "var(--secondary)",
                                   borderRadius: "50%",
-                                  boxShadow: "0 0 8px rgba(0, 138, 14, 0.4)",
+                                boxShadow: "0 0 8px rgba(37, 78, 75, 0.35)",
                                 }} />
-                                <span style={{ color: "#008A0E", fontWeight: 600, fontSize: 13 }}>
+                                <span style={{ color: "var(--secondary)", fontWeight: 600, fontSize: 13 }}>
                                   ✓ Éxito
                                 </span>
                               </>
@@ -593,14 +436,14 @@ export default function HistorialPage() {
                                     display: "inline-block",
                                     width: 10,
                                     height: 10,
-                                    background: "#f44",
+                                    background: "var(--primary)",
                                     borderRadius: "50%",
-                                    boxShadow: "0 0 8px rgba(255, 68, 68, 0.4)",
+                                    boxShadow: "0 0 8px rgba(188, 75, 47, 0.28)",
                                   }}
                                 />
                                 <span
                                   style={{
-                                    color: "#f44",
+                                    color: "var(--primary)",
                                     fontWeight: 600,
                                     fontSize: 13,
                                     cursor: "help",

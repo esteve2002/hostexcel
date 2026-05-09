@@ -460,11 +460,15 @@ export default function VisualizarPage() {
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      {/* Header */}
-      <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a2e", marginBottom: 24 }}>
+    <div className="page-shell-compact stack-lg">
+      <div className="page-hero" style={{ marginBottom: 0 }}>
+      <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 12 }}>
         📊 Visualizar Datos
       </h1>
+      <p className="page-subtitle">
+        Explora ventas, inventario, escandallo y proveedores con la misma identidad visual del resto de la app.
+      </p>
+      </div>
 
       {error && (
         <div
@@ -482,43 +486,12 @@ export default function VisualizarPage() {
       )}
 
       {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          marginBottom: 24,
-          borderBottom: "2px solid #eee",
-        }}
-      >
+      <div className="pill-tabs">
         {(["ventas", "inventario", "escandallo", "proveedores"] as TabType[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            style={{
-              padding: "12px 24px",
-              background: activeTab === tab ? "#008A0E" : "transparent",
-              color: activeTab === tab ? "white" : "#666",
-              border: "none",
-              borderBottom: activeTab === tab ? "3px solid #293AFF" : "none",
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: "pointer",
-              textTransform: "capitalize",
-              transition: "all 0.2s ease",
-              borderRadius: activeTab === tab ? "8px 8px 0 0" : "8px",
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== tab) {
-                e.currentTarget.style.backgroundColor = "rgba(0, 138, 14, 0.1)";
-                e.currentTarget.style.color = "#008A0E";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== tab) {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = "#666";
-              }
-            }}
+            className={`pill-tab ${activeTab === tab ? 'active' : ''}`}
           >
             {tab === "ventas" && "📈 Ventas"}
             {tab === "inventario" && "📦 Inventario"}
@@ -529,11 +502,11 @@ export default function VisualizarPage() {
       </div>
 
       {/* Content */}
-      <div style={{ background: "white", borderRadius: 12, padding: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+      <div className="section-card section-card--pad stack-lg">
         {activeTab === "ventas" && (
           <div>
             {/* Stats Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+            <div className="metric-grid metric-grid-4">
               <StatCard label="Margen Bruto Total" value={`€${margenBrutoTotal.toFixed(2)}`} color="#008A0E" />
               <StatCard label="Ticket Medio" value={`€${ticketMedio.toFixed(2)}`} color="#293AFF" />
               <StatCard label="Total Ventas" value={(weekFilter === "all" ? ventas : filteredVentas).reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0).toFixed(2)} color="#008A0E" />
@@ -542,42 +515,33 @@ export default function VisualizarPage() {
 
             {/* Comparativa Semanal */}
             {comparativaSemanal && (
-              <div style={{ 
-                background: comparativaSemanal.change >= 0 ? "rgba(0, 138, 14, 0.05)" : "rgba(255, 68, 68, 0.05)", 
-                border: `1px solid ${comparativaSemanal.change >= 0 ? "#008A0E" : "#f44"}`,
-                borderRadius: 12, 
-                padding: 20, 
-                marginBottom: 24,
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-              }}>
+              <div className="section-card section-card--pad" style={{ background: comparativaSemanal.change >= 0 ? "rgba(37,78,75,0.08)" : "rgba(188,75,47,0.08)", marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ fontSize: 32 }}>
                   {comparativaSemanal.change >= 0 ? "📈" : "📉"}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: 14, color: "#666" }}>
+                  <p style={{ margin: 0, fontSize: 14, color: "var(--text-secondary)" }}>
                     Comparativa: {comparativaSemanal.currentWeek} vs {comparativaSemanal.prevWeek}
                   </p>
-                  <p style={{ margin: "4px 0 0 0", fontSize: 24, fontWeight: 700, color: comparativaSemanal.change >= 0 ? "#008A0E" : "#f44" }}>
+                  <p style={{ margin: "4px 0 0 0", fontSize: 24, fontWeight: 700, color: comparativaSemanal.change >= 0 ? "var(--secondary)" : "var(--primary)" }}>
                     {comparativaSemanal.change >= 0 ? "+" : ""}{comparativaSemanal.change.toFixed(1)}%
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Esta semana</p>
-                  <p style={{ margin: "4px 0 0 0", fontSize: 18, fontWeight: 600, color: "#1a1a2e" }}>
+                  <p style={{ margin: 0, fontSize: 13, color: "var(--text-secondary)" }}>Esta semana</p>
+                  <p style={{ margin: "4px 0 0 0", fontSize: 18, fontWeight: 600, color: "var(--text-primary)" }}>
                     €{comparativaSemanal.currentTotal.toFixed(2)}
                   </p>
-                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#666" }}>
+                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "var(--text-muted)" }}>
                     Margen: €{comparativaSemanal.currentMargen.toFixed(2)}
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Semana anterior</p>
-                  <p style={{ margin: "4px 0 0 0", fontSize: 18, fontWeight: 600, color: "#1a1a2e" }}>
+                  <p style={{ margin: 0, fontSize: 13, color: "var(--text-secondary)" }}>Semana anterior</p>
+                  <p style={{ margin: "4px 0 0 0", fontSize: 18, fontWeight: 600, color: "var(--text-primary)" }}>
                     €{comparativaSemanal.prevTotal.toFixed(2)}
                   </p>
-                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#666" }}>
+                  <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "var(--text-muted)" }}>
                     Margen: €{comparativaSemanal.prevMargen.toFixed(2)}
                   </p>
                 </div>

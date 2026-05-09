@@ -289,9 +289,9 @@ export default function SubirExcelPage() {
   if (!mounted) return null;
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "20px 0" }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a2e", margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
+    <div className="page-shell-compact stack-lg">
+      <div className="page-hero" style={{ marginBottom: 0 }}>
+        <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{
             display: "inline-flex",
             alignItems: "center",
@@ -307,51 +307,36 @@ export default function SubirExcelPage() {
           </span>
           SUBIDA DE EXCELS
         </h1>
-        <p style={{ color: "#666", fontSize: 15, marginTop: 8, marginLeft: 60 }}>
+        <p className="page-subtitle" style={{ marginLeft: 60 }}>
           Sube tu archivo Excel para analizar y gestionar los datos de tu restaurante
         </p>
       </div>
 
-      <div style={{
-        background: "white",
-        borderRadius: 16,
-        padding: 40,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-        marginBottom: 24,
-        border: "1px solid #eee"
-      }}>
+      <div className="section-card section-card--pad stack-lg">
         <label
           htmlFor="fileInput"
-          style={{
-            display: "block",
-            padding: "60px 40px",
-            border: `3px dashed ${file ? "#008A0E" : "#ddd"}`,
-            borderRadius: 16,
-            textAlign: "center",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            background: file ? "rgba(0, 138, 14, 0.05)" : "#fafafa",
-          }}
+          className="upload-dropzone"
+          style={{ borderColor: file ? "var(--secondary)" : undefined, background: file ? "rgba(37,78,75,0.08)" : undefined }}
           onMouseEnter={(e) => {
             if (!file) {
-              (e.currentTarget as HTMLElement).style.borderColor = "#008A0E";
-              (e.currentTarget as HTMLElement).style.background = "rgba(0, 138, 14, 0.05)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(188,75,47,0.06)";
             }
           }}
           onMouseLeave={(e) => {
             if (!file) {
-              (e.currentTarget as HTMLElement).style.borderColor = "#ddd";
-              (e.currentTarget as HTMLElement).style.background = "#fafafa";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(80,55,42,0.2)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,248,236,0.72)";
             }
           }}
         >
           <div style={{ fontSize: 64, marginBottom: 16 }}>
             {file ? "✅" : "📂"}
           </div>
-          <p style={{ fontSize: 18, color: "#333", fontWeight: 600, marginBottom: 8 }}>
+          <p style={{ fontSize: 18, color: "var(--text-primary)", fontWeight: 600, marginBottom: 8 }}>
             {file ? "Archivo seleccionado" : "Arrastra un archivo o haz clic aquí"}
           </p>
-          <p style={{ fontSize: 14, color: "#888" }}>
+          <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
             Formatos soportados: .xlsx, .xls
           </p>
         </label>
@@ -359,26 +344,17 @@ export default function SubirExcelPage() {
           id="fileInput"
           type="file"
           accept=".xlsx,.xls"
-          style={{ display: "none" }}
-          onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
-        />
+            style={{ display: "none" }}
+            onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+          />
 
         {file && (
-          <div style={{
-            marginTop: 20,
-            padding: "16px 20px",
-            background: "rgba(0, 138, 14, 0.1)",
-            borderRadius: 12,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            border: "1px solid rgba(0, 138, 14, 0.2)"
-          }}>
+          <div className="section-card" style={{ marginTop: 20, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(37,78,75,0.08)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <span style={{ fontSize: 24 }}>📄</span>
               <div>
-                <p style={{ margin: 0, fontWeight: 600, color: "#008A0E", fontSize: 15 }}>{file.name}</p>
-                <p style={{ margin: 0, color: "#666", fontSize: 13, marginTop: 2 }}>
+                <p style={{ margin: 0, fontWeight: 600, color: "var(--secondary)", fontSize: 15 }}>{file.name}</p>
+                <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13, marginTop: 2 }}>
                   {(file.size / 1024).toFixed(2)} KB
                 </p>
               </div>
@@ -388,7 +364,7 @@ export default function SubirExcelPage() {
               style={{
                 background: "none",
                 border: "none",
-                color: "#666",
+                color: "var(--text-muted)",
                 cursor: "pointer",
                 fontSize: 20,
                 padding: 4,
@@ -400,25 +376,19 @@ export default function SubirExcelPage() {
         )}
 
         {preview && !showMapping && (
-          <div style={{
-            marginTop: 16,
-            padding: "16px 20px",
-            background: preview.missingColumns.length === 0 && preview.suggestedType ? "rgba(0, 138, 14, 0.05)" : "#fff8e1",
-            borderRadius: 12,
-            border: `1px solid ${preview.missingColumns.length === 0 && preview.suggestedType ? "#008A0E" : "#ffe082"}`,
-          }}>
+          <div className="section-card" style={{ marginTop: 16, padding: "16px 20px", background: preview.missingColumns.length === 0 && preview.suggestedType ? "rgba(37,78,75,0.08)" : "rgba(230,177,93,0.12)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#333" }}>
                   {preview.suggestedType
                     ? `Tipo detectado: ${EXCEL_TYPE_LABELS[preview.suggestedType]}`
-                    : "No se pudo detectar automáticamente el tipo de Excel"}
+                  : "No se pudo detectar automáticamente el tipo de Excel"}
                 </p>
-                <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#666" }}>
+                <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "var(--text-secondary)" }}>
                   Columnas: {preview.columns.join(", ")}
                 </p>
                 {preview.missingColumns.length > 0 && preview.suggestedType && (
-                  <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#c0392b" }}>
+                  <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "var(--primary)" }}>
                     Faltan: {preview.missingColumns.join(", ")}
                   </p>
                 )}
@@ -427,9 +397,9 @@ export default function SubirExcelPage() {
                 onClick={() => setShowMapping(true)}
                 style={{
                   padding: "8px 16px",
-                  background: preview.missingColumns.length > 0 ? "linear-gradient(135deg, #293AFF 0%, #1A28CC 100%)" : "transparent",
-                  color: preview.missingColumns.length > 0 ? "white" : "#293AFF",
-                  border: preview.missingColumns.length > 0 ? "none" : "1px solid #293AFF",
+                  background: preview.missingColumns.length > 0 ? "var(--primary)" : "transparent",
+                  color: preview.missingColumns.length > 0 ? "white" : "var(--primary)",
+                  border: preview.missingColumns.length > 0 ? "none" : "1px solid var(--primary)",
                   borderRadius: 8,
                   cursor: "pointer",
                   fontWeight: 600,
@@ -444,7 +414,7 @@ export default function SubirExcelPage() {
         )}
       </div>
 
-      <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+      <div className="page-toolbar" style={{ marginBottom: 24 }}>
         <button
           onClick={handleStartUpload}
           disabled={loading || !file || (showMapping && !allRequiredMapped)}
@@ -453,7 +423,7 @@ export default function SubirExcelPage() {
             padding: "14px 28px",
             background: loading || !file || (showMapping && !allRequiredMapped)
               ? "#aaa"
-              : "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
+              : "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
             color: "white",
             borderRadius: 10,
             border: "none",
@@ -461,7 +431,7 @@ export default function SubirExcelPage() {
             fontSize: 16,
             fontWeight: 600,
             transition: "all 0.2s ease",
-            boxShadow: loading || !file ? "none" : "0 4px 12px rgba(0, 138, 14, 0.3)",
+            boxShadow: loading || !file ? "none" : "0 4px 12px rgba(37, 78, 75, 0.3)",
           }}
           onMouseEnter={(e) => {
             if (!loading && file) {
@@ -490,9 +460,9 @@ export default function SubirExcelPage() {
               Subiendo...
             </span>
           ) : (
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <span>🚀</span> SUBIR EXCEL
-            </span>
+              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <span>🚀</span> SUBIR EXCEL
+              </span>
           )}
         </button>
 
@@ -501,10 +471,10 @@ export default function SubirExcelPage() {
           disabled={!hasContent}
           style={{
             padding: "14px 28px",
-            background: !hasContent ? "#aaa" : "white",
-            color: !hasContent ? "white" : "#293AFF",
+            background: !hasContent ? "#aaa" : "rgba(255,252,246,0.9)",
+            color: !hasContent ? "white" : "var(--primary)",
             borderRadius: 10,
-            border: !hasContent ? "none" : "2px solid #293AFF",
+            border: !hasContent ? "none" : "2px solid var(--primary)",
             cursor: !hasContent ? "not-allowed" : "pointer",
             fontSize: 16,
             fontWeight: 600,
@@ -512,12 +482,12 @@ export default function SubirExcelPage() {
           }}
           onMouseEnter={(e) => {
             if (hasContent) {
-              (e.currentTarget as HTMLElement).style.background = "rgba(41, 58, 255, 0.1)";
+                (e.currentTarget as HTMLElement).style.background = "rgba(188,75,47,0.08)";
             }
           }}
           onMouseLeave={(e) => {
             if (hasContent) {
-              (e.currentTarget as HTMLElement).style.background = "white";
+                (e.currentTarget as HTMLElement).style.background = "rgba(255,252,246,0.9)";
             }
           }}
         >
@@ -526,14 +496,7 @@ export default function SubirExcelPage() {
       </div>
 
       {duplicado && (
-        <div style={{
-          marginBottom: 24,
-          padding: "20px 24px",
-          background: "#fff8e1",
-          border: "1px solid #ffe082",
-          borderRadius: 12,
-          color: "#7a5a00",
-        }}>
+        <div className="section-card section-card--pad" style={{ marginBottom: 24, background: "rgba(230,177,93,0.12)", color: "#7a5a00" }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
             <span style={{ fontSize: 24 }}>⚠️</span>
             <div style={{ flex: 1 }}>

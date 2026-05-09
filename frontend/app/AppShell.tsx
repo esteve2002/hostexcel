@@ -14,81 +14,66 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isActive = (path: string) => pathname === path;
 
   const navItems = [
-    { href: '/', label: 'INICIO', icon: '📊' },
-    { href: '/subir-excel', label: 'SUBIR EXCEL', icon: '📤' },
-    { href: '/historial', label: 'HISTORIAL', icon: '📁' },
-    { href: '/visualizar', label: 'VISUALIZAR', icon: '📈' },
-    { href: '/configuracion', label: 'CONFIGURACIÓN', icon: '⚙️' },
+    { href: '/', label: 'Inicio', icon: '📊' },
+    { href: '/subir-excel', label: 'Subir Excel', icon: '📤' },
+    { href: '/historial', label: 'Historial', icon: '📁' },
+    { href: '/visualizar', label: 'Visualizar', icon: '📈' },
+    { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside
-        style={{
-          backgroundColor: "var(--sidebar-bg)",
-          width: "240px",
-          minHeight: "100vh",
-          padding: "28px 12px",
-          display: "flex",
-          flexDirection: "column",
-          position: "fixed",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 100,
-          borderRight: "1px solid rgba(255,255,255,0.04)",
-        }}
-      >
-        <div style={{
+    <div className="app-frame">
+      <aside className="app-sidebar">
+        <div className="brand-area" style={{
           display: "flex",
           alignItems: "center",
-          gap: "14px",
-          padding: "0 12px",
-          marginBottom: "44px",
+          gap: "12px",
+          padding: "4px 12px 0",
+          marginBottom: "36px",
         }}>
           <div
+            className="brand-mark"
             style={{
-              width: "40px",
-              height: "40px",
-              background: "linear-gradient(135deg, #7A9E56 0%, #C4953E 100%)",
+              width: "38px",
+              height: "38px",
               borderRadius: "10px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               color: "white",
               fontWeight: 800,
-              fontSize: "20px",
+              fontSize: "18px",
               fontFamily: "var(--font-display)",
-              letterSpacing: "0.5px",
-              boxShadow: "0 4px 16px rgba(196, 149, 62, 0.25)",
+              flexShrink: 0,
             }}
           >
             H
           </div>
           <div>
             <div style={{
-              fontSize: "18px",
-              fontWeight: 800,
+              fontSize: "17px",
+              fontWeight: 700,
               color: "white",
               fontFamily: "var(--font-display)",
-              letterSpacing: "0.5px",
+              letterSpacing: "-0.3px",
               lineHeight: 1.2,
             }}>
               HostExcel
             </div>
             <div style={{
               fontSize: "10px",
-              color: "rgba(255,255,255,0.35)",
+              color: "rgba(255,255,255,0.3)",
               fontWeight: 500,
-              letterSpacing: "1.5px",
+              letterSpacing: "0.8px",
               textTransform: "uppercase",
+              marginTop: 1,
             }}>
               Restaurantes
             </div>
           </div>
         </div>
 
-        <nav style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+        <nav style={{ display: "flex", flexDirection: "column", gap: "2px", flex: 1 }}>
           {navItems.map(item => {
             const active = isActive(item.href);
             return (
@@ -96,71 +81,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 prefetch={false}
-                style={{
-                  color: active ? "white" : "rgba(255,255,255,0.5)",
-                  textDecoration: "none",
-                  fontWeight: active ? 600 : 500,
-                  fontSize: "13px",
-                  letterSpacing: "0.3px",
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  transition: "all 0.2s ease",
-                  background: active ? "rgba(255,255,255,0.08)" : "transparent",
-                  position: "relative",
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.8)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
-                  }
-                }}
+                className={`nav-link ${active ? 'active' : ''}`}
               >
-                {active && (
-                  <div style={{
-                    position: "absolute",
-                    left: 0,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: 3,
-                    height: 20,
-                    borderRadius: "0 3px 3px 0",
-                    background: "linear-gradient(180deg, #7A9E56, #C4953E)",
-                  }} />
-                )}
-                <span style={{ fontSize: "16px", opacity: active ? 1 : 0.6 }}>{item.icon}</span>
+                <span style={{ fontSize: "16px", opacity: active ? 1 : 0.5 }}>{item.icon}</span>
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div style={{
-          padding: "16px 14px",
+        <div className="sidebar-footnote" style={{
+          padding: "12px 14px",
           borderRadius: 8,
           background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.05)",
+          fontSize: "11px",
+          color: "rgba(255,255,255,0.25)",
+          textAlign: "center",
         }}>
-          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", fontWeight: 500, letterSpacing: "0.5px" }}>
-            © {new Date().getFullYear()} HostExcel
-          </div>
+          © {new Date().getFullYear()} HostExcel
         </div>
       </aside>
 
-      <main style={{
-        flex: 1,
-        marginLeft: "240px",
-        padding: "32px 40px",
-        minHeight: "100vh",
-      }}>
+      <main className="app-main">
         {children}
       </main>
     </div>

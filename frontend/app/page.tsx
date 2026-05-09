@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { extractNetworkErrorMessage } from "@/lib/errorHandler";
-import { getWeekNumber, parseFlexibleDate } from "@/lib/date";
+import { formatSpanishDate, getWeekNumber, parseFlexibleDate } from "@/lib/date";
 import {
   XAxis,
   YAxis,
@@ -224,7 +224,7 @@ export default function Home() {
     {
       icon: "📈", label: "Ventas esta semana",
       value: `€${totalVentasSemana.toFixed(2)}`,
-      sub: `Semana ${thisWeek}`,
+      sub: formatSpanishDate(new Date()),
       trend: ventasEstaSemana.length > 0 ? "up" : null,
     },
     {

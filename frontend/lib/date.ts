@@ -42,3 +42,11 @@ export function getWeekNumber(date: Date): string {
   const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
   return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`
 }
+
+export function formatSpanishDate(date: Date): string {
+  return new Intl.DateTimeFormat('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
+}

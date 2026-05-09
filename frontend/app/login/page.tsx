@@ -69,10 +69,39 @@ export default function LoginPage() {
     <div style={{
       minHeight: "100vh",
       display: "flex",
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       background: "#FAFAFA",
+      padding: 20,
     }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 40 }}>
+        <div
+          style={{
+            width: 80,
+            height: 80,
+            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+            borderRadius: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: 800,
+            fontSize: 40,
+            boxShadow: "0 8px 32px rgba(0, 138, 14, 0.3)",
+            marginBottom: 16,
+          }}
+        >
+          H
+        </div>
+        <h1 style={{ fontSize: 36, fontWeight: 800, color: "#1a1a2e", margin: 0, letterSpacing: "0.5px" }}>
+          HostExcel
+        </h1>
+        <p style={{ color: "#888", fontSize: 15, marginTop: 8 }}>
+          Gestión inteligente de Excels para restaurantes
+        </p>
+      </div>
+
       <div style={{
         background: "white",
         padding: 40,
@@ -81,13 +110,6 @@ export default function LoginPage() {
         width: "100%",
         maxWidth: 400,
       }}>
-        <h1 style={{ marginBottom: 8, fontSize: 24, fontWeight: 700, color: "#1a1a2e" }}>
-          Bienvenido a HostExcel
-        </h1>
-        <p style={{ marginBottom: 28, color: "#888", fontSize: 14 }}>
-          Inicia sesión para continuar
-        </p>
-
         {errors.general && (
           <div style={{
             marginBottom: 16,

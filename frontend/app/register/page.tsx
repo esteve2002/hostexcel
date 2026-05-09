@@ -24,14 +24,12 @@ export default function RegisterPage() {
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
 
-    // Validar email
     if (!email.trim()) {
       newErrors.email = "El email es obligatorio";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "El formato del email no es válido (ej: usuario@dominio.com)";
     }
 
-    // Validar contraseña
     if (!password) {
       newErrors.password = "La contraseña es obligatoria";
     } else if (password.length < 6) {
@@ -40,7 +38,6 @@ export default function RegisterPage() {
       newErrors.password = "La contraseña no puede superar los 50 caracteres";
     }
 
-    // Validar nombre
     if (!nombre.trim()) {
       newErrors.nombre = "El nombre del restaurante es obligatorio";
     } else if (nombre.trim().length < 2) {
@@ -77,7 +74,6 @@ export default function RegisterPage() {
       if (!res.ok) {
         const errorMessage = await extractErrorMessage(res);
         
-        // Intentar detectar qué campo tiene el error
         if (errorMessage.toLowerCase().includes("email") || errorMessage.toLowerCase().includes("ya existe")) {
           setErrors({ email: errorMessage });
         } else if (errorMessage.toLowerCase().includes("contraseña") || errorMessage.toLowerCase().includes("password")) {
@@ -105,6 +101,7 @@ export default function RegisterPage() {
       <div style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         background: "#FAFAFA",
@@ -117,7 +114,20 @@ export default function RegisterPage() {
           textAlign: "center",
           maxWidth: 400,
         }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+          <div style={{
+            width: 64,
+            height: 64,
+            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+            borderRadius: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 16px",
+            fontSize: 32,
+            boxShadow: "0 4px 16px rgba(0, 138, 14, 0.3)",
+          }}>
+            ✅
+          </div>
           <h2 style={{ color: "#008A0E", marginBottom: 8 }}>¡Registro exitoso!</h2>
           <p style={{ color: "#666", fontSize: 14 }}>
             Tu cuenta ha sido creada. Redirigiendo al login...
@@ -131,10 +141,39 @@ export default function RegisterPage() {
     <div style={{
       minHeight: "100vh",
       display: "flex",
+      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       background: "#FAFAFA",
+      padding: 20,
     }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 40 }}>
+        <div
+          style={{
+            width: 80,
+            height: 80,
+            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+            borderRadius: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: 800,
+            fontSize: 40,
+            boxShadow: "0 8px 32px rgba(0, 138, 14, 0.3)",
+            marginBottom: 16,
+          }}
+        >
+          H
+        </div>
+        <h1 style={{ fontSize: 36, fontWeight: 800, color: "#1a1a2e", margin: 0, letterSpacing: "0.5px" }}>
+          HostExcel
+        </h1>
+        <p style={{ color: "#888", fontSize: 15, marginTop: 8 }}>
+          Crea tu cuenta de restaurante
+        </p>
+      </div>
+
       <div style={{
         background: "white",
         padding: 40,
@@ -143,13 +182,6 @@ export default function RegisterPage() {
         width: "100%",
         maxWidth: 400,
       }}>
-        <h1 style={{ marginBottom: 8, fontSize: 24, fontWeight: 700, color: "#1a1a2e" }}>
-          Registro - HostExcel
-        </h1>
-        <p style={{ marginBottom: 28, color: "#888", fontSize: 14 }}>
-          Crea tu cuenta de restaurante
-        </p>
-
         {errors.general && (
           <div style={{
             marginBottom: 16,
@@ -183,7 +215,6 @@ export default function RegisterPage() {
                 setErrors({ ...errors, nombre: "El nombre debe tener al menos 2 caracteres" });
               }
             }}
-            onKeyDown={(e) => e.key === "Enter" && handleRegister()}
             placeholder="Mi Restaurante"
             style={{
               display: "block",
@@ -197,6 +228,7 @@ export default function RegisterPage() {
               boxSizing: "border-box",
               background: errors.nombre ? "#fff0f0" : "white",
             }}
+            onKeyDown={(e) => e.key === "Enter" && handleRegister()}
           />
           {errors.nombre && (
             <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#c0392b" }}>{errors.nombre}</p>
@@ -239,17 +271,15 @@ export default function RegisterPage() {
         </div>
 
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 13, fontWeight: 600, color: errors.password ? "#c0392b" : "#444" }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: "#444" }}>
             Contraseña * (mínimo 6 caracteres)
           </label>
           <input
             type="password"
             value={password}
-            onChange={(e) => {
-              setTelefono(e.target.value);
-            }}
+            onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleRegister()}
-            placeholder="+34 600 000 000"
+            placeholder="••••••••"
             style={{
               display: "block",
               width: "100%",

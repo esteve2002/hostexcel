@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 
 type ValidationErrors = {
   email?: string;
@@ -73,38 +74,18 @@ export default function RegisterPage() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        // Manejar diferentes tipos de errores del servidor
-        if (data.detail) {
-          if (Array.isArray(data.detail)) {
-            // Error de validación de FastAPI
-            const serverErrors: ValidationErrors = {};
-            data.detail.forEach((err: any) => {
-              if (err.loc && err.loc.includes("email")) {
-                serverErrors.email = err.msg;
-              } else if (err.loc && err.loc.includes("password")) {
-                serverErrors.password = err.msg;
-              } else if (err.loc && err.loc.includes("nombre_restaurante")) {
-                serverErrors.nombre = err.msg;
-              } else {
-                serverErrors.general = err.msg || "Error de validación";
-              }
-            });
-            setErrors(serverErrors);
-          } else if (typeof data.detail === "string") {
-            // Error de string simple
-            if (data.detail.includes("email") || data.detail.includes("ya existe")) {
-              setErrors({ email: "Este email ya está registrado" });
-            } else {
-              setErrors({ general: data.detail });
-            }
-          } else {
-            setErrors({ general: "Error al registrarse" });
-          }
+        const errorMessage = await extractErrorMessage(res);
+        
+        // Intentar detectar qué campo tiene el error
+        if (errorMessage.toLowerCase().includes("email") || errorMessage.toLowerCase().includes("ya existe")) {
+          setErrors({ email: errorMessage });
+        } else if (errorMessage.toLowerCase().includes("contraseña") || errorMessage.toLowerCase().includes("password")) {
+          setErrors({ password: errorMessage });
+        } else if (errorMessage.toLowerCase().includes("nombre") || errorMessage.toLowerCase().includes("restaurante")) {
+          setErrors({ nombre: errorMessage });
         } else {
-          setErrors({ general: "Error al registrarse. Por favor, inténtalo de nuevo." });
+          setErrors({ general: errorMessage });
         }
       } else {
         setSuccess(true);
@@ -113,7 +94,7 @@ export default function RegisterPage() {
         }, 2000);
       }
     } catch (err) {
-      setErrors({ general: "Error de conexión. Verifica tu internet e inténtalo de nuevo." });
+      setErrors({ general: extractNetworkErrorMessage(err) });
     }
 
     setLoading(false);

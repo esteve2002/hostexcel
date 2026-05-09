@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 import {
   LineChart,
   Line,
@@ -125,7 +126,7 @@ export default function Home() {
 
         setLoading(false);
       } catch (err) {
-        setError("Error cargando datos");
+        setError(extractNetworkErrorMessage(err));
         setLoading(false);
       }
     };

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 import {
   LineChart,
   Line,
@@ -105,12 +106,24 @@ export default function VisualizarPage() {
         }
 
         if (!ventasRes.ok || !inventarioRes.ok || !escandalloRes.ok || !proveedoresRes.ok) {
-          const errorDetails = [];
-          if (!ventasRes.ok) errorDetails.push(`ventas: ${ventasRes.status}`);
-          if (!inventarioRes.ok) errorDetails.push(`inventario: ${inventarioRes.status}`);
-          if (!escandalloRes.ok) errorDetails.push(`escandallo: ${escandalloRes.status}`);
-          if (!proveedoresRes.ok) errorDetails.push(`proveedores: ${proveedoresRes.status}`);
-          setError(`Error cargando datos (${errorDetails.join(", ")})`);
+          const failedRequests = [];
+          if (!ventasRes.ok) {
+            const msg = await extractErrorMessage(ventasRes);
+            failedRequests.push(`Ventas: ${msg}`);
+          }
+          if (!inventarioRes.ok) {
+            const msg = await extractErrorMessage(inventarioRes);
+            failedRequests.push(`Inventario: ${msg}`);
+          }
+          if (!escandalloRes.ok) {
+            const msg = await extractErrorMessage(escandalloRes);
+            failedRequests.push(`Escandallo: ${msg}`);
+          }
+          if (!proveedoresRes.ok) {
+            const msg = await extractErrorMessage(proveedoresRes);
+            failedRequests.push(`Proveedores: ${msg}`);
+          }
+          setError(failedRequests.join(" | "));
           setLoading(false);
           return;
         }
@@ -128,7 +141,7 @@ export default function VisualizarPage() {
         setProveedores(p || []);
         setLoading(false);
       } catch (err) {
-        setError("Error cargando datos");
+        setError(extractNetworkErrorMessage(err));
         setLoading(false);
       }
     };

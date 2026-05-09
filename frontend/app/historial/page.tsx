@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 
 interface Upload {
   id: string;
@@ -46,26 +47,33 @@ export default function HistorialPage() {
       return;
     }
 
-    fetch(`/api/historial/uploads`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
+    const fetchUploads = async () => {
+      try {
+        const res = await fetch(`/api/historial/uploads`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
         if (!res.ok) {
-          router.push("/login");
-          return null;
+          if (res.status === 401) {
+            router.push("/login");
+          } else {
+            const errorMessage = await extractErrorMessage(res);
+            setError(errorMessage);
+          }
+          setLoading(false);
+          return;
         }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setUploads(data);
-        }
+        
+        const data = await res.json();
+        setUploads(data || []);
         setLoading(false);
-      })
-      .catch((err) => {
-        setError("Error cargando el historial");
+      } catch (err) {
+        setError(extractNetworkErrorMessage(err));
         setLoading(false);
-      });
+      }
+    };
+
+    fetchUploads();
   }, []);
 
   // Filtrar uploads

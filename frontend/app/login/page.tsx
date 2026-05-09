@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 
 type ValidationErrors = {
   email?: string;
@@ -49,28 +50,16 @@ export default function LoginPage() {
         body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        if (data.detail) {
-          if (typeof data.detail === "string") {
-            if (data.detail.includes("Credenciales")) {
-              setErrors({ general: "Email o contraseña incorrectos. Verifica tus datos." });
-            } else {
-              setErrors({ general: data.detail });
-            }
-          } else {
-            setErrors({ general: "Error al iniciar sesión" });
-          }
-        } else {
-          setErrors({ general: "Error al iniciar sesión. Inténtalo de nuevo." });
-        }
+        const errorMessage = await extractErrorMessage(res);
+        setErrors({ general: errorMessage });
       } else {
+        const data = await res.json();
         document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
         router.push("/");
       }
     } catch (err) {
-      setErrors({ general: "Error de conexión. Verifica tu internet e inténtalo de nuevo." });
+      setErrors({ general: extractNetworkErrorMessage(err) });
     }
 
     setLoading(false);

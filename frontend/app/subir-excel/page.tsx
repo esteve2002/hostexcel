@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 
 export default function SubirExcelPage() {
   const [mounted, setMounted] = useState(false);
@@ -58,13 +59,15 @@ export default function SubirExcelPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-      const data = await res.json();
 
       if (res.status === 409) {
-        setDuplicado(data.detail);
+        const data = await res.json();
+        setDuplicado(data.detail || "Este archivo ya fue subido anteriormente");
       } else if (!res.ok) {
-        setError(typeof data.detail === "string" ? data.detail : "Error desconocido");
+        const errorMessage = await extractErrorMessage(res);
+        setError(errorMessage);
       } else {
+        const data = await res.json();
         setResult(data);
         if (data.data && data.data.length > 0) {
           const cols = Object.keys(data.data[0]);
@@ -80,8 +83,8 @@ export default function SubirExcelPage() {
           }
         }
       }
-    } catch {
-      setError("Error de conexión con el servidor");
+    } catch (err) {
+      setError(extractNetworkErrorMessage(err));
     }
     setLoading(false);
   };
@@ -100,14 +103,15 @@ export default function SubirExcelPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-      const data = await res.json();
       if (!res.ok) {
-        setError(typeof data.detail === "string" ? data.detail : "Error desconocido");
+        const errorMessage = await extractErrorMessage(res);
+        setError(errorMessage);
       } else {
+        const data = await res.json();
         setResult(data);
       }
-    } catch {
-      setError("Error de conexión con el servidor");
+    } catch (err) {
+      setError(extractNetworkErrorMessage(err));
     }
     setLoading(false);
   };

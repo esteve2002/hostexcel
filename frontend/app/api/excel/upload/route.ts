@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
     const result = await processExcel(buffer, userId, true, force, mapping)
 
     return NextResponse.json(result)
-  } catch (error: any) {
-    const message = error.message || 'Error desconocido'
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error desconocido'
     const status = message.includes('sobreescribirlas') ? 409 : 400
     return NextResponse.json({ error: message }, { status })
   }

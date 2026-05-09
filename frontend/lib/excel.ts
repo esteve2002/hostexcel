@@ -1,12 +1,12 @@
 import * as XLSX from 'xlsx'
 import { supabase } from './supabase'
-import { normalizeColumn, suggestColumnMapping, applyMapping, REQUIRED_COLUMNS, EXCEL_TYPE_LABELS, SYSTEM_COLUMN_LABELS, type ExcelType, type ColumnMapping } from './columnMapper'
+import { normalizeColumn, suggestColumnMapping, applyMapping, REQUIRED_COLUMNS, EXCEL_TYPE_LABELS, SYSTEM_COLUMN_LABELS, type ExcelType } from './columnMapper'
 
 export type { ExcelType }
 export { REQUIRED_COLUMNS, EXCEL_TYPE_LABELS, SYSTEM_COLUMN_LABELS, normalizeColumn }
 
 export interface ExcelRow {
-  [key: string]: any
+  [key: string]: string | number | boolean | Date | null | undefined
 }
 
 export interface PreviewResult {
@@ -36,6 +36,42 @@ export function parseExcel(buffer: ArrayBuffer): { data: ExcelRow[], columns: st
   const data = XLSX.utils.sheet_to_json(worksheet) as ExcelRow[]
   const columns = data.length > 0 ? Object.keys(data[0] as object) : []
   return { data, columns }
+}
+
+function normalizeExcelDate(value: unknown): string | null {
+  if (value === null || value === undefined || value === '') return null
+
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().split('T')[0]
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const parsed = XLSX.SSF.parse_date_code(value)
+    if (!parsed) return null
+    const y = String(parsed.y).padStart(4, '0')
+    const m = String(parsed.m).padStart(2, '0')
+    const d = String(parsed.d).padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }
+
+  const text = String(value).trim()
+  if (!text) return null
+
+  if (/^\d+(\.\d+)?$/.test(text)) {
+    const parsed = XLSX.SSF.parse_date_code(Number(text))
+    if (!parsed) return null
+    const y = String(parsed.y).padStart(4, '0')
+    const m = String(parsed.m).padStart(2, '0')
+    const d = String(parsed.d).padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }
+
+  const parsed = new Date(text)
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed.toISOString().split('T')[0]
+  }
+
+  return null
 }
 
 export function previewExcel(buffer: ArrayBuffer): PreviewResult {
@@ -77,14 +113,16 @@ export function validateVentas(data: ExcelRow[]): ExcelRow[] {
   const validData: ExcelRow[] = []
 
   data.forEach((row, index) => {
-    const fecha = row['fecha']
+    const fecha = normalizeExcelDate(row['fecha'])
     const producto = row['producto']
     const cantidad = Number(row['cantidad_vendida'])
     const precio = Number(row['precio_unitario'])
     const total = row['total'] !== undefined ? Number(row['total']) : null
 
-    if (!fecha || isNaN(Date.parse(String(fecha)))) {
+    if (!fecha) {
       errors.push(`Fila ${index + 1}: Fecha inválida (${fecha})`)
+    } else {
+      row['fecha'] = fecha
     }
 
     if (!producto || String(producto).trim() === '') {
@@ -167,7 +205,7 @@ export function validateInventario(data: ExcelRow[]): ExcelRow[] {
     const producto = row['producto']
     const stockActual = Number(row['stock_actual'])
     const stockMinimo = Number(row['stock_minimo'])
-    const fecha = row['fecha_ultima_compra']
+    const fecha = normalizeExcelDate(row['fecha_ultima_compra'])
 
     if (!producto || String(producto).trim() === '') {
       errors.push(`Fila ${index + 1}: Producto vacío`)
@@ -181,8 +219,10 @@ export function validateInventario(data: ExcelRow[]): ExcelRow[] {
       errors.push(`Fila ${index + 1}: Stock mínimo inválido`)
     }
 
-    if (fecha && isNaN(Date.parse(String(fecha)))) {
+    if (row['fecha_ultima_compra'] !== undefined && !fecha) {
       errors.push(`Fila ${index + 1}: Fecha inválida`)
+    } else if (fecha) {
+      row['fecha_ultima_compra'] = fecha
     }
 
     validData.push(row)
@@ -307,7 +347,7 @@ export async function processExcel(
       original_columns: columns,
       mapped_columns: Object.keys(validatedData[0] || {}),
     })
-  } catch (e) {
+  } catch {
     // Ignorar error de historial
   }
 

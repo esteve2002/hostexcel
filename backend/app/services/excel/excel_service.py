@@ -41,7 +41,7 @@ async def process_excel(file: UploadFile, save: bool = False, user_id: str = Non
         elif excel_type == "ventas":
             data = validate_ventas(df)
             if save:
-                fechas = pd.to_datetime(df["fecha"])
+                fechas = pd.to_datetime(pd.Series([row["fecha"] for row in data]), errors="coerce")
                 fecha_min = fechas.min().date().isoformat()
                 fecha_max = fechas.max().date().isoformat()
 

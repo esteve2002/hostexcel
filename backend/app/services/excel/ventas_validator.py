@@ -4,6 +4,29 @@ from fastapi import HTTPException
 REQUIRED_COLUMNS = ["fecha", "producto", "cantidad_vendida", "precio_unitario"]
 
 
+def normalize_excel_date(value):
+    if pd.isna(value):
+        return None
+
+    if isinstance(value, pd.Timestamp):
+        return value.date().isoformat()
+
+    if hasattr(value, "isoformat") and not isinstance(value, str):
+        try:
+            return value.isoformat()
+        except Exception:
+            pass
+
+    if isinstance(value, (int, float)):
+        return (pd.Timestamp("1899-12-30") + pd.to_timedelta(value, unit="D")).date().isoformat()
+
+    parsed = pd.to_datetime(value, errors="coerce")
+    if pd.isna(parsed):
+        return None
+
+    return parsed.date().isoformat()
+
+
 def validate_ventas(df):
     cols = set(df.columns)
 
@@ -26,17 +49,17 @@ def validate_ventas(df):
 
     # Validación fila por fila
     for index, row in df.iterrows():
-        fecha = row["fecha"]
+        fecha = normalize_excel_date(row["fecha"])
         producto = row["producto"]
         cantidad = row["cantidad_vendida"]
         precio = row["precio_unitario"]
         total = row["total"] if "total" in df.columns else None
 
         # Validar fecha
-        try:
-            pd.to_datetime(fecha)
-        except Exception:
+        if not fecha:
             errors.append(f"Fila {index+1}: Fecha inválida ({fecha}).")
+        else:
+            df.at[index, "fecha"] = fecha
 
         # Producto no puede estar vacío
         if pd.isna(producto) or str(producto).strip() == "":

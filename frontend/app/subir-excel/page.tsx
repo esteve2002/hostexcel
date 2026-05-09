@@ -282,9 +282,9 @@ export default function SubirExcelPage() {
     ? [...REQUIRED_COLUMNS[preview.suggestedType]]
     : [];
 
-  const unmappedCols = preview
-    ? preview.columns.filter(c => !mapping[c])
-    : [];
+  const allRequiredMapped = preview && preview.suggestedType
+    ? REQUIRED_COLUMNS[preview.suggestedType].every(c => Object.values(mapping).includes(c))
+    : true;
 
   if (!mounted) return null;
 
@@ -447,11 +447,11 @@ export default function SubirExcelPage() {
       <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
         <button
           onClick={handleStartUpload}
-          disabled={loading || !file || (showMapping && unmappedCols.length > 0)}
+          disabled={loading || !file || (showMapping && !allRequiredMapped)}
           style={{
             flex: 1,
             padding: "14px 28px",
-            background: loading || !file || (showMapping && unmappedCols.length > 0)
+            background: loading || !file || (showMapping && !allRequiredMapped)
               ? "#aaa"
               : "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
             color: "white",
@@ -695,7 +695,7 @@ export default function SubirExcelPage() {
               background: "white",
               borderRadius: 16,
               padding: 32,
-              maxWidth: 640,
+              maxWidth: 720,
               width: "95%",
               maxHeight: "90vh",
               overflowY: "auto",
@@ -706,14 +706,14 @@ export default function SubirExcelPage() {
             <h3 style={{ marginTop: 0, fontSize: 20, fontWeight: 700, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
               🔄 Mapear columnas
             </h3>
-            <p style={{ color: "#555", fontSize: 14, marginBottom: 16 }}>
-              Asigna las columnas de tu Excel a los campos del sistema.
+            <p style={{ color: "#555", fontSize: 14, marginBottom: 20 }}>
+              Indica qué columna de tu Excel corresponde a cada campo del sistema.
               {preview.suggestedType && (
-                <> Tipo detectado: <strong>{EXCEL_TYPE_LABELS[preview.suggestedType]}</strong></>
+                <> Tipo: <strong>{EXCEL_TYPE_LABELS[preview.suggestedType]}</strong></>
               )}
             </p>
 
-            <div style={{ marginBottom: 20 }}>
+            <div style={{ marginBottom: 24 }}>
               <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>
                 TPV / Software de gestión
               </label>
@@ -722,6 +722,7 @@ export default function SubirExcelPage() {
                 onChange={(e) => handleTpvChange(e.target.value)}
                 style={{
                   width: "100%",
+                  maxWidth: 320,
                   padding: "10px 12px",
                   borderRadius: 8,
                   border: "1px solid #ddd",
@@ -729,86 +730,126 @@ export default function SubirExcelPage() {
                   background: "white",
                 }}
               >
-                <option value="">Sin TPV específico (detección automática)</option>
+                <option value="">Sin TPV específico</option>
                 {TPV_PRESETS.filter(p => p.name !== 'custom').map(p => (
                   <option key={p.name} value={p.name}>{p.label}</option>
                 ))}
               </select>
-              <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#888" }}>
-                Selecciona tu TPV para rellenar automáticamente el mapeo
-              </p>
             </div>
 
-            <div style={{ background: "#f5f5f5", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-              <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "40%" }}>Tu Excel</th>
-                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "40%" }}>Campo del sistema</th>
-                    <th style={{ textAlign: "center", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "20%" }}>Obligatorio</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.columns.map((col) => {
-                    const mapped = mapping[col] || '';
-                    const isRequired = requiredCols.includes(mapped);
-                    const isMissing = requiredCols.includes(mapped);
-                    return (
-                      <tr key={col}>
-                        <td style={{ padding: "6px 8px", color: "#333", fontWeight: 500 }}>
-                          {col}
-                        </td>
-                        <td style={{ padding: "6px 8px" }}>
-                          <select
-                            value={mapped}
-                            onChange={(e) => handleMappingChange(col, e.target.value)}
-                            style={{
-                              width: "100%",
-                              padding: "6px 8px",
-                              borderRadius: 6,
-                              border: `1px solid ${mapped ? "#008A0E" : "#ddd"}`,
-                              fontSize: 13,
-                              background: mapped ? "rgba(0, 138, 14, 0.05)" : "white",
-                            }}
-                          >
-                            <option value="">— No usar —</option>
-                            {requiredCols.map((rc) => (
-                              <option key={rc} value={rc}>
-                                {SYSTEM_COLUMN_LABELS[rc] || rc}
-                              </option>
-                            ))}
-                            {mapped && !requiredCols.includes(mapped) && (
-                              <option value={mapped}>{SYSTEM_COLUMN_LABELS[mapped] || mapped}</option>
-                            )}
-                          </select>
-                        </td>
-                        <td style={{ padding: "6px 8px", textAlign: "center" }}>
-                          {requiredCols.includes(mapped) ? (
-                            <span style={{ color: "#008A0E", fontSize: 16 }}>✓</span>
-                          ) : requiredCols.includes(col) || preview.missingColumns.includes(normalizeColumn(col)) ? (
-                            <span style={{ color: "#c0392b", fontSize: 13 }}>⚠️</span>
-                          ) : (
-                            <span style={{ color: "#ccc" }}>—</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div style={{ marginBottom: 24 }}>
+              {requiredCols.map((sysCol) => {
+                const mappedCol = Object.entries(mapping).find(([_, v]) => v === sysCol)?.[0] || '';
+                const label = SYSTEM_COLUMN_LABELS[sysCol] || sysCol;
+                const unassigned = preview.columns.filter(c => !Object.values(mapping).includes(c));
+
+                return (
+                  <div key={sysCol} style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    marginBottom: 12,
+                    padding: "12px 16px",
+                    background: mappedCol ? "rgba(0, 138, 14, 0.04)" : "#fff8e1",
+                    borderRadius: 12,
+                    border: `1px solid ${mappedCol ? "rgba(0, 138, 14, 0.2)" : "#ffe082"}`,
+                    transition: "all 0.2s ease",
+                  }}>
+                    <div style={{ minWidth: 160 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: "#1a1a2e" }}>{label}</div>
+                      <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{sysCol}</div>
+                    </div>
+
+                    <div style={{ flexShrink: 0, color: mappedCol ? "#008A0E" : "#ccc", fontSize: 20 }}>
+                      {mappedCol ? '⟶' : '···'}
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <select
+                        value={mappedCol}
+                        onChange={(e) => {
+                          const newMapping = { ...mapping };
+                          const prevCol = Object.entries(newMapping).find(([_, v]) => v === sysCol)?.[0];
+                          if (prevCol) delete newMapping[prevCol];
+                          if (e.target.value) newMapping[e.target.value] = sysCol;
+                          setMapping(newMapping);
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: 8,
+                          border: `1px solid ${mappedCol ? "#008A0E" : "#ddd"}`,
+                          fontSize: 14,
+                          background: mappedCol ? "white" : "#fafafa",
+                          fontWeight: mappedCol ? 500 : 400,
+                          color: "#333",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="">— Selecciona columna —</option>
+                        {preview.columns.map((col) => {
+                          const alreadyUsed = Object.values(mapping).includes(sysCol)
+                            ? false
+                            : Object.values(mapping).includes(col);
+                          return (
+                            <option key={col} value={col} disabled={alreadyUsed}>
+                              {col} {alreadyUsed ? '(ya asignada)' : ''}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+
+                    {mappedCol && (
+                      <div style={{
+                        background: "#008A0E",
+                        color: "white",
+                        borderRadius: 20,
+                        width: 24,
+                        height: 24,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}>
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div style={{
-              padding: 12,
-              background: unmappedCols.length > 5 ? "#fff8e1" : "rgba(0, 138, 14, 0.05)",
-              borderRadius: 8,
-              marginBottom: 20,
+              padding: 16,
+              background: requiredCols.every(c => Object.values(mapping).includes(c))
+                ? "rgba(0, 138, 14, 0.06)"
+                : "#fff8e1",
+              borderRadius: 12,
+              marginBottom: 24,
               fontSize: 13,
-              color: unmappedCols.length > 5 ? "#7a5a00" : "#008A0E",
+              border: `1px solid ${
+                requiredCols.every(c => Object.values(mapping).includes(c))
+                  ? "#008A0E"
+                  : "#ffe082"
+              }`,
             }}>
-              {unmappedCols.length > 0
-                ? `${unmappedCols.length} columna(s) sin mapear: ${unmappedCols.join(", ")}`
-                : "Todas las columnas están mapeadas correctamente"}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16 }}>
+                  {requiredCols.every(c => Object.values(mapping).includes(c)) ? '✅' : '⚠️'}
+                </span>
+                <span style={{ color: requiredCols.every(c => Object.values(mapping).includes(c)) ? "#008A0E" : "#7a5a00", fontWeight: 500 }}>
+                  {requiredCols.every(c => Object.values(mapping).includes(c))
+                    ? 'Todos los campos obligatorios están mapeados'
+                    : `Faltan campos obligatorios por mapear`}
+                </span>
+              </div>
+              <div style={{ marginTop: 4, fontSize: 12, color: "#888" }}>
+                Columnas de tu Excel sin usar:{' '}
+                {preview.columns.filter(c => !Object.values(mapping).includes(c)).join(', ') || 'ninguna'}
+              </div>
             </div>
 
             <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
@@ -839,6 +880,7 @@ export default function SubirExcelPage() {
                   fontWeight: 600,
                   fontSize: 14,
                   boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
+                  opacity: requiredCols.every(c => Object.values(mapping).includes(c)) ? 1 : 0.6,
                 }}
               >
                 ✓ Confirmar mapping

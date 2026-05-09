@@ -11,25 +11,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email y password son requeridos' }, { status: 400 })
     }
 
+    const usuario = {
+      email,
+      password_hash: hashPassword(password),
+      nombre_restaurante,
+      telefono,
+    } as never
+
     const { data, error } = await supabase
       .from('usuarios')
-      .insert({
-        email,
-        password_hash: hashPassword(password),
-        nombre_restaurante,
-        telefono,
-      })
+      .insert(usuario)
       .select()
       .single()
+
+    const createdUser = data as { id: string } | null
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    const token = createToken(data.id)
+    if (!createdUser) {
+      return NextResponse.json({ error: 'No se pudo crear el usuario' }, { status: 400 })
+    }
+
+    const token = createToken(createdUser.id)
 
     return NextResponse.json({ token })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error desconocido' }, { status: 500 })
   }
 }

@@ -130,7 +130,7 @@ export function detectPossibleColumns(originalCols: string[]): Record<string, st
 
   for (const col of originalCols) {
     const norm = normalizeColumn(col);
-    for (const [field, _label] of Object.entries(SYSTEM_COLUMN_LABELS)) {
+    for (const [field] of Object.entries(SYSTEM_COLUMN_LABELS)) {
       if (norm === field) {
         suggestions[col] = field;
         break;
@@ -200,7 +200,7 @@ export function suggestColumnMapping(
     if (suggestions[original]) continue;
     for (const preset of TPV_PRESETS) {
       for (const [presetOriginal, presetMapped] of Object.entries(preset.mappings)) {
-        if (norm === normalizeColumn(presetOriginal) && !used.has(presetMapped) && required.includes(presetMapped as any)) {
+        if (norm === normalizeColumn(presetOriginal) && !used.has(presetMapped) && required.includes(presetMapped)) {
           suggestions[original] = presetMapped;
           used.add(presetMapped);
           break;
@@ -214,10 +214,10 @@ export function suggestColumnMapping(
 }
 
 export function applyMapping(
-  row: Record<string, any>,
+  row: Record<string, string | number | boolean | Date | null | undefined>,
   mapping: Record<string, string>,
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): Record<string, string | number | boolean | Date | null | undefined> {
+  const result: Record<string, string | number | boolean | Date | null | undefined> = {};
   for (const [originalCol, mappedCol] of Object.entries(mapping)) {
     if (originalCol in row) {
       result[mappedCol] = row[originalCol];
@@ -242,7 +242,7 @@ export async function fetchMappings(
     .eq('excel_type', excelType);
 
   if (error) throw error;
-  return data || [];
+  return (data as ColumnMapping[] | null) || [];
 }
 
 export async function saveMapping(
@@ -259,11 +259,13 @@ export async function saveMapping(
     .eq('original_column', originalColumn)
     .single();
 
-  if (existing) {
+  const existingMapping = existing as { id: number } | null;
+
+  if (existingMapping) {
     await supabase
       .from('excel_column_mappings')
       .update({ mapped_column: mappedColumn })
-      .eq('id', existing.id);
+      .eq('id', existingMapping.id);
   } else {
     await supabase
       .from('excel_column_mappings')

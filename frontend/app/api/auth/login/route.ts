@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { verifyPassword, createToken } from '@/lib/auth'
 
+type UsuarioLogin = {
+  id: string
+  password_hash: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -17,18 +22,20 @@ export async function POST(request: NextRequest) {
       .eq('email', email)
       .single()
 
-    if (error || !data) {
+    const user = data as UsuarioLogin | null
+
+    if (error || !user) {
       return NextResponse.json({ error: 'Credenciales incorrectas' }, { status: 401 })
     }
 
-    if (!verifyPassword(password, data.password_hash)) {
+    if (!verifyPassword(password, user.password_hash)) {
       return NextResponse.json({ error: 'Credenciales incorrectas' }, { status: 401 })
     }
 
-    const token = createToken(data.id)
+    const token = createToken(user.id)
 
     return NextResponse.json({ token })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error desconocido' }, { status: 500 })
   }
 }

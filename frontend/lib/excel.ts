@@ -297,7 +297,14 @@ export async function processExcel(
     case 'ventas':
       validatedData = validateVentas(mappedData)
       if (save) {
-        const fechas = validatedData.map(r => new Date(r['fecha'])).sort((a, b) => a.getTime() - b.getTime())
+        const fechas = validatedData
+          .map((r) => {
+            const fecha = r['fecha']
+            if (fecha instanceof Date) return fecha
+            if (typeof fecha === 'string' || typeof fecha === 'number') return new Date(fecha)
+            throw new Error(`Fecha inválida (${fecha})`)
+          })
+          .sort((a, b) => a.getTime() - b.getTime())
         const fechaMin = fechas[0].toISOString().split('T')[0]
         const fechaMax = fechas[fechas.length - 1].toISOString().split('T')[0]
 
@@ -308,7 +315,9 @@ export async function processExcel(
           .gte('fecha', fechaMin)
           .lte('fecha', fechaMax)
 
-        if (existing && existing.length > 0) {
+        const existingRows = Array.isArray(existing) ? existing : []
+
+        if (existingRows.length > 0) {
           if (!force) {
             throw new Error(`Ya tienes ventas registradas entre ${fechaMin} y ${fechaMax}. ¿Quieres sobreescribirlas?`)
           } else {

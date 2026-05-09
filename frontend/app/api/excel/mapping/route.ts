@@ -15,17 +15,21 @@ export async function POST(request: NextRequest) {
       .eq('original_column', original_column)
       .single()
 
-    if (existing) {
+    const existingMapping = existing as { id: string } | null
+
+    if (existingMapping) {
       // Update
       const { data, error } = await supabase
         .from('excel_column_mappings')
         .update({ mapped_column })
-        .eq('id', existing.id)
+        .eq('id', existingMapping.id)
         .select()
         .single()
 
+      const updatedMapping = data as { id: string } | null
+
       if (error) throw error
-      return NextResponse.json({ status: 'updated', id: data.id })
+      return NextResponse.json({ status: 'updated', id: updatedMapping?.id })
     } else {
       // Create
       const { data, error } = await supabase
@@ -34,11 +38,13 @@ export async function POST(request: NextRequest) {
         .select()
         .single()
 
+      const createdMapping = data as { id: string } | null
+
       if (error) throw error
-      return NextResponse.json({ status: 'created', id: data.id })
+      return NextResponse.json({ status: 'created', id: createdMapping?.id })
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error desconocido' }, { status: 400 })
   }
 }
 
@@ -61,7 +67,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error
 
     return NextResponse.json({ mappings: data || [] })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Error desconocido' }, { status: 400 })
   }
 }

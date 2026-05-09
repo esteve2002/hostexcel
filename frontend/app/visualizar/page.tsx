@@ -548,7 +548,7 @@ export default function VisualizarPage() {
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
               <div>
                 <VentasTab data={filteredVentas} />
               </div>
@@ -601,12 +601,12 @@ export default function VisualizarPage() {
             </div>
 
             {/* Top 3 Platos Más Vendidos */}
-            <div style={{ marginTop: 32 }}>
+            <div style={{ marginTop: 40 }}>
               <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: "var(--text-primary)" }}>
                 🏆 Top 3 Platos Más Vendidos
               </h3>
               {top3ProductosVendidos.length > 0 ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 16, height: 200 }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 24, height: 220 }}>
                   {/* 2do lugar */}
                   {top3ProductosVendidos[1] && (
                     <div style={{ textAlign: "center", width: 120 }}>
@@ -828,14 +828,14 @@ function VentasTab({ data }: { data: Venta[] }) {
   const productos = new Set(data.map((v) => v.producto)).size;
 
   return (
-    <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 24 }}>
+    <div className="stack-lg">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 24, marginBottom: 28 }}>
               <StatCard label="Total Ventas" value={totalVentas.toFixed(2)} color="var(--secondary)" />
               <StatCard label="Cantidad Promedio" value={cantidadPromedio} color="var(--primary)" />
               <StatCard label="Productos Vendidos" value={productos.toString()} color="var(--secondary)" />
       </div>
 
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "#1a1a2e" }}>
+      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: "var(--text-primary)" }}>
         Detalle de Ventas
       </h3>
       <table
@@ -846,24 +846,24 @@ function VentasTab({ data }: { data: Venta[] }) {
         }}
       >
         <thead>
-          <tr style={{ background: "#f9f9f9", borderBottom: "2px solid #ddd" }}>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Fecha</th>
-            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "#333" }}>Producto</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Cantidad</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Precio</th>
-            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#333" }}>Total</th>
+          <tr style={{ background: "rgba(255,248,236,0.72)", borderBottom: "2px solid var(--border-light)" }}>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-muted)" }}>Fecha</th>
+            <th style={{ padding: 12, textAlign: "left", fontWeight: 600, color: "var(--text-muted)" }}>Producto</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-muted)" }}>Cantidad</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-muted)" }}>Precio</th>
+            <th style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--text-muted)" }}>Total</th>
           </tr>
         </thead>
         <tbody>
           {data.map((venta, idx) => (
-            <tr key={idx} style={{ borderBottom: "1px solid #f0f0f0" }}>
-              <td style={{ padding: 12, color: "#666" }}>
+            <tr key={idx} style={{ borderBottom: "1px solid rgba(56,41,31,0.08)" }}>
+              <td style={{ padding: 12, color: "var(--text-secondary)" }}>
                 {new Date(venta.fecha).toLocaleDateString("es-ES")}
               </td>
-              <td style={{ padding: 12, color: "#333" }}>{venta.producto}</td>
-              <td style={{ padding: 12, textAlign: "right", color: "#666" }}>{venta.cantidad_vendida}</td>
-              <td style={{ padding: 12, textAlign: "right", color: "#666" }}>€{venta.precio_unitario.toFixed(2)}</td>
-              <td style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "#008A0E" }}>
+              <td style={{ padding: 12, color: "var(--text-primary)" }}>{venta.producto}</td>
+              <td style={{ padding: 12, textAlign: "right", color: "var(--text-secondary)" }}>{venta.cantidad_vendida}</td>
+              <td style={{ padding: 12, textAlign: "right", color: "var(--text-secondary)" }}>€{venta.precio_unitario.toFixed(2)}</td>
+              <td style={{ padding: 12, textAlign: "right", fontWeight: 600, color: "var(--secondary)" }}>
                 €{(venta.total || venta.cantidad_vendida * venta.precio_unitario).toFixed(2)}
               </td>
             </tr>
@@ -887,7 +887,7 @@ function InventarioTab({
   productosBajoStock: InventarioItem[] 
 }) {
   if (data.length === 0) {
-    return <div style={{ color: "#888", textAlign: "center", padding: 40 }}>No hay datos de inventario</div>;
+    return <div style={{ color: "var(--text-muted)", textAlign: "center", padding: 40 }}>No hay datos de inventario</div>;
   }
 
   const bajoStock = data.filter((i) => i.stock_actual <= i.stock_minimo).length;

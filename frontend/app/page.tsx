@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { extractNetworkErrorMessage } from "@/lib/errorHandler";
+import { getWeekNumber, parseFlexibleDate } from "@/lib/date";
 import {
   XAxis,
   YAxis,
@@ -42,15 +43,6 @@ interface Proveedor {
   email: string;
   telefono: string;
   direccion: string;
-}
-
-function getWeekNumber(date: Date): string {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
 }
 
 export default function Home() {
@@ -113,7 +105,10 @@ export default function Home() {
 
   const thisWeek = getWeekNumber(new Date());
   const ventasEstaSemana = useMemo(() => {
-    return ventas.filter(v => getWeekNumber(new Date(v.fecha)) === thisWeek);
+    return ventas.filter(v => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? getWeekNumber(fecha) === thisWeek : false;
+    });
   }, [ventas, thisWeek]);
 
   const totalVentasSemana = ventasEstaSemana.reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0);
@@ -174,13 +169,19 @@ export default function Home() {
 
     const weeksToCheck: string[] = [];
     for (let i = 0; i < 3; i++) { const d = new Date(); d.setDate(d.getDate() - (i * 7)); weeksToCheck.push(getWeekNumber(d)); }
-    const ventasRecientes = ventas.filter(v => weeksToCheck.includes(getWeekNumber(new Date(v.fecha))));
+    const ventasRecientes = ventas.filter(v => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? weeksToCheck.includes(getWeekNumber(fecha)) : false;
+    });
     if (ventasRecientes.length === 0 && ventas.length > 0) alertasList.push({ type: "warning", message: "No hay ventas en las últimas 3 semanas" });
 
     const hoy = new Date();
     inventario.forEach(item => {
-      const dias = Math.floor((hoy.getTime() - new Date(item.fecha_ultima_compra).getTime()) / (1000 * 60 * 60 * 24));
-      if (dias > 30) alertasList.push({ type: "info", message: `${item.producto} lleva ${Math.floor(dias)} días sin movimiento` });
+      const fechaCompra = parseFlexibleDate(item.fecha_ultima_compra);
+      if (fechaCompra) {
+        const dias = Math.floor((hoy.getTime() - fechaCompra.getTime()) / (1000 * 60 * 60 * 24));
+        if (dias > 30) alertasList.push({ type: "info", message: `${item.producto} lleva ${Math.floor(dias)} días sin movimiento` });
+      }
     });
 
     return alertasList;
@@ -191,9 +192,12 @@ export default function Home() {
     const totals = new Array(7).fill(0);
     const counts = new Array(7).fill(0);
     ventasEstaSemana.forEach(v => {
-      const day = new Date(v.fecha).getDay();
-      totals[day] += v.total || v.cantidad_vendida * v.precio_unitario;
-      counts[day] += 1;
+      const fecha = parseFlexibleDate(v.fecha);
+      if (fecha) {
+        const day = fecha.getDay();
+        totals[day] += v.total || v.cantidad_vendida * v.precio_unitario;
+        counts[day] += 1;
+      }
     });
     return days.map((day, idx) => ({ day, total: totals[idx], count: counts[idx] }));
   }, [ventasEstaSemana]);

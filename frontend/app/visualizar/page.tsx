@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
+import { getWeekNumber, parseFlexibleDate } from "@/lib/date";
 import {
   XAxis,
   YAxis,
@@ -45,16 +46,6 @@ interface Proveedor {
 }
 
 type TabType = "ventas" | "inventario" | "escandallo" | "proveedores";
-
-// Función para obtener el número de semana
-function getWeekNumber(date: Date): string {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-  return `${d.getUTCFullYear()}-W${weekNo.toString().padStart(2, '0')}`;
-}
 
 export default function VisualizarPage() {
   const router = useRouter();
@@ -150,7 +141,8 @@ export default function VisualizarPage() {
   const availableWeeks = useMemo(() => {
     const weeks = new Set<string>();
     ventas.forEach((v) => {
-      weeks.add(getWeekNumber(new Date(v.fecha)));
+      const fecha = parseFlexibleDate(v.fecha);
+      if (fecha) weeks.add(getWeekNumber(fecha));
     });
     return Array.from(weeks).sort();
   }, [ventas]);
@@ -158,7 +150,10 @@ export default function VisualizarPage() {
   // Filtrar ventas por semana
   const filteredVentas = useMemo(() => {
     if (weekFilter === "all") return ventas;
-    return ventas.filter((v) => getWeekNumber(new Date(v.fecha)) === weekFilter);
+    return ventas.filter((v) => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? getWeekNumber(fecha) === weekFilter : false;
+    });
   }, [ventas, weekFilter]);
 
   // Datos agrupados por semana para el gráfico
@@ -168,7 +163,9 @@ export default function VisualizarPage() {
     const dataToUse = weekFilter === "all" ? ventas : filteredVentas;
 
     dataToUse.forEach((v) => {
-      const week = getWeekNumber(new Date(v.fecha));
+      const fecha = parseFlexibleDate(v.fecha);
+      if (!fecha) return;
+      const week = getWeekNumber(fecha);
       if (!grouped[week]) {
         grouped[week] = { week, total: 0, count: 0 };
       }
@@ -225,7 +222,10 @@ export default function VisualizarPage() {
   // Filtrar ventas con margen por semana
   const filteredVentasConMargen = useMemo(() => {
     if (weekFilter === "all") return ventasConMargen;
-    return ventasConMargen.filter(v => getWeekNumber(new Date(v.fecha)) === weekFilter);
+    return ventasConMargen.filter(v => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? getWeekNumber(fecha) === weekFilter : false;
+    });
   }, [ventasConMargen, weekFilter]);
 
   // Margen bruto total
@@ -262,8 +262,14 @@ export default function VisualizarPage() {
       prevWeek = availableWeeks[idx - 1];
     }
 
-    const currentData = ventasConMargen.filter(v => getWeekNumber(new Date(v.fecha)) === currentWeek);
-    const prevData = ventasConMargen.filter(v => getWeekNumber(new Date(v.fecha)) === prevWeek);
+    const currentData = ventasConMargen.filter(v => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? getWeekNumber(fecha) === currentWeek : false;
+    });
+    const prevData = ventasConMargen.filter(v => {
+      const fecha = parseFlexibleDate(v.fecha);
+      return fecha ? getWeekNumber(fecha) === prevWeek : false;
+    });
 
     const currentTotal = currentData.reduce((sum, v) => sum + (v.revenue || 0), 0);
     const prevTotal = prevData.reduce((sum, v) => sum + (v.revenue || 0), 0);
@@ -313,7 +319,9 @@ export default function VisualizarPage() {
     const counts = new Array(7).fill(0);
 
     dataToUse.forEach((v) => {
-      const day = new Date(v.fecha).getDay();
+      const fecha = parseFlexibleDate(v.fecha);
+      if (!fecha) return;
+      const day = fecha.getDay();
       totals[day] += v.revenue || 0;
       counts[day] += 1;
     });
@@ -344,14 +352,14 @@ export default function VisualizarPage() {
   const rotacionLenta = useMemo(() => {
     return [...inventario]
       .sort((a, b) => {
-        const dateA = new Date(a.fecha_ultima_compra).getTime();
-        const dateB = new Date(b.fecha_ultima_compra).getTime();
+        const dateA = parseFlexibleDate(a.fecha_ultima_compra)?.getTime() ?? 0;
+        const dateB = parseFlexibleDate(b.fecha_ultima_compra)?.getTime() ?? 0;
         return dateA - dateB; // Más antiguo primero
       })
       .slice(0, 5) // Top 5 productos más lentos
       .map(item => ({
         ...item,
-        diasEnStock: Math.floor((new Date().getTime() - new Date(item.fecha_ultima_compra).getTime()) / (1000 * 60 * 60 * 24))
+        diasEnStock: Math.floor((new Date().getTime() - (parseFlexibleDate(item.fecha_ultima_compra)?.getTime() ?? new Date().getTime())) / (1000 * 60 * 60 * 24))
       }));
   }, [inventario]);
 
@@ -394,8 +402,8 @@ export default function VisualizarPage() {
       let ultimaCompra: Date | null = null;
       inventario.forEach(item => {
         if (productosDeProveedor.includes(item.producto)) {
-          const fecha = new Date(item.fecha_ultima_compra);
-          if (!ultimaCompra || fecha > ultimaCompra) {
+          const fecha = parseFlexibleDate(item.fecha_ultima_compra);
+          if (fecha && (!ultimaCompra || fecha > ultimaCompra)) {
             ultimaCompra = fecha;
           }
         }
@@ -404,8 +412,8 @@ export default function VisualizarPage() {
       // Si no hay productos directos, usar fecha_ultima_compra del producto más reciente en inventario
       if (!ultimaCompra && inventario.length > 0) {
         const masReciente = inventario.reduce((max, item) => {
-          const fecha = new Date(item.fecha_ultima_compra);
-          return fecha > max ? fecha : max;
+          const fecha = parseFlexibleDate(item.fecha_ultima_compra);
+          return fecha && fecha > max ? fecha : max;
         }, new Date(0));
         ultimaCompra = masReciente;
       }
@@ -600,12 +608,12 @@ export default function VisualizarPage() {
                 🏆 Top 3 Platos Más Vendidos
               </h3>
               {top3ProductosVendidos.length > 0 ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 28, height: 260, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 20, minHeight: 260, flexWrap: "wrap" }}>
                   {/* 2do lugar */}
                   {top3ProductosVendidos[1] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(31,91,87,0.96) 0%, rgba(31,91,87,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 92, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 30px rgba(36,24,20,0.14)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      <div style={{ background: "linear-gradient(180deg, rgba(31,91,87,0.96) 0%, rgba(31,91,87,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 30px rgba(36,24,20,0.14)", border: "1px solid rgba(255,255,255,0.12)" }}>
                         {top3ProductosVendidos[1].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[1].total.toFixed(2)}</span>
                       </div>
@@ -617,9 +625,9 @@ export default function VisualizarPage() {
 
                   {/* 1er lugar */}
                   {top3ProductosVendidos[0] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 8px", borderRadius: "12px 12px 0 0", height: 112, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)", border: "1px solid rgba(255,255,255,0.12)" }}>
                         {top3ProductosVendidos[0].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[0].total.toFixed(2)}</span>
                       </div>
@@ -631,9 +639,9 @@ export default function VisualizarPage() {
 
                   {/* 3er lugar */}
                   {top3ProductosVendidos[2] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(194,76,42,0.96) 0%, rgba(194,76,42,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 72, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
+                      <div style={{ background: "linear-gradient(180deg, rgba(194,76,42,0.96) 0%, rgba(194,76,42,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {top3ProductosVendidos[2].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>€{top3ProductosVendidos[2].total.toFixed(2)}</span>
                       </div>
@@ -656,12 +664,12 @@ export default function VisualizarPage() {
                 ⚠️ Peores 3 Platos (Menor Margen)
               </h3>
               {peores3Platos.length > 0 ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 28, height: 260, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 20, minHeight: 260, flexWrap: "wrap" }}>
                   {/* 2do peor */}
                   {peores3Platos[1] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥈</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 92, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 30px rgba(36,24,20,0.14)" }}>
+                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 96, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 30px rgba(36,24,20,0.14)" }}>
                         {peores3Platos[1].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[1].margen.toFixed(2)}</span>
                       </div>
@@ -673,9 +681,9 @@ export default function VisualizarPage() {
 
                   {/* 1er peor */}
                   {peores3Platos[0] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥇</div>
-                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 8px", borderRadius: "12px 12px 0 0", height: 112, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)" }}>
+                      <div style={{ background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)", color: "white", padding: "18px 10px", borderRadius: "12px 12px 0 0", minHeight: 116, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 16px 40px rgba(36,24,20,0.20)" }}>
                         {peores3Platos[0].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[0].margen.toFixed(2)}</span>
                       </div>
@@ -687,9 +695,9 @@ export default function VisualizarPage() {
 
                   {/* 3er peor */}
                   {peores3Platos[2] && (
-                    <div style={{ textAlign: "center", width: 120 }}>
+                    <div style={{ textAlign: "center", width: 160 }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>🥉</div>
-                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "12px 8px", borderRadius: "12px 12px 0 0", height: 72, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
+                      <div style={{ background: "linear-gradient(180deg, rgba(197,139,40,0.96) 0%, rgba(197,139,40,0.84) 100%)", color: "white", padding: "14px 10px", borderRadius: "12px 12px 0 0", minHeight: 76, display: "flex", flexDirection: "column", justifyContent: "center", fontWeight: 600, fontSize: 14, boxShadow: "0 12px 28px rgba(36,24,20,0.16)" }}>
                         {peores3Platos[2].producto}
                         <span style={{ fontSize: 12, opacity: 0.92 }}>Margen: €{peores3Platos[2].margen.toFixed(2)}</span>
                       </div>
@@ -880,7 +888,7 @@ function InventarioTab({
                     <td style={{ padding: "12px 16px", color: "var(--text-primary)", fontWeight: 600 }}>{item.producto}</td>
                     <td style={{ padding: "12px 16px", textAlign: "right", color: "var(--secondary)", fontWeight: 600 }}>{item.stock_actual}</td>
                     <td style={{ padding: "12px 16px", color: "var(--text-secondary)" }}>
-                      {new Date(item.fecha_ultima_compra).toLocaleDateString("es-ES")}
+                      {parseFlexibleDate(item.fecha_ultima_compra)?.toLocaleDateString("es-ES") || "—"}
                     </td>
                     <td style={{ 
                       padding: "12px 16px", 
@@ -932,7 +940,7 @@ function InventarioTab({
                 <td style={{ padding: 12, textAlign: "right", color: "var(--text-secondary)" }}>{item.stock_minimo}</td>
                 <td style={{ padding: 12, color: statusColor, fontWeight: 600 }}>{estado}</td>
                 <td style={{ padding: 12, color: "var(--text-secondary)" }}>
-                  {new Date(item.fecha_ultima_compra).toLocaleDateString("es-ES")}
+                  {parseFlexibleDate(item.fecha_ultima_compra)?.toLocaleDateString("es-ES") || "—"}
                 </td>
               </tr>
             );

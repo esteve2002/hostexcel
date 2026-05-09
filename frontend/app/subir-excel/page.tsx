@@ -1,6 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import * as XLSX from 'xlsx';
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
+import {
+  previewExcel,
+  processExcel,
+  type ExcelType,
+  normalizeColumn,
+  REQUIRED_COLUMNS,
+  EXCEL_TYPE_LABELS,
+  SYSTEM_COLUMN_LABELS,
+} from "@/lib/excel";
+import {
+  TPV_PRESETS,
+  fetchMappings,
+  saveMappingsBatch,
+  suggestColumnMapping,
+  type TpvPreset,
+} from "@/lib/columnMapper";
 
 export default function SubirExcelPage() {
   const [mounted, setMounted] = useState(false);
@@ -9,10 +26,37 @@ export default function SubirExcelPage() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [duplicado, setDuplicado] = useState<string | null>(null);
-  const [showMappingModal, setShowMappingModal] = useState(false);
-  const [mappingInfo, setMappingInfo] = useState<{ original: string; mapeado: string }[]>([]);
+
+  const [preview, setPreview] = useState<{
+    columns: string[];
+    data: any[];
+    suggestedType: ExcelType | null;
+    missingColumns: string[];
+  } | null>(null);
+
+  const [showMapping, setShowMapping] = useState(false);
+  const [mapping, setMapping] = useState<Record<string, string>>({});
+  const [selectedTpv, setSelectedTpv] = useState<string>('');
+
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
+
+  const getToken = () =>
+    document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("token="))
+      ?.split("=")[1];
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUserId(payload.sub);
+      } catch {}
+    }
+  }, []);
 
   const hasContent = !!(file || result || error || duplicado);
 
@@ -27,31 +71,148 @@ export default function SubirExcelPage() {
     cantidad: "Cantidad",
     unidad: "Unidad",
     precio_unidad: "Precio/Unidad",
+    fecha: "Fecha",
+    cantidad_vendida: "Cantidad Vendida",
+    precio_unitario: "Precio Unitario",
+    total: "Total",
+    stock_actual: "Stock Actual",
+    stock_minimo: "Stock Mínimo",
+    fecha_ultima_compra: "Última Compra",
   };
-
-  const getToken = () =>
-    document.cookie
-      .split("; ")
-      .find((c) => c.startsWith("token="))
-      ?.split("=")[1];
 
   const cleanAll = () => {
     setError(null);
     setFile(null);
-    setShowMappingModal(false);
     setResult(null);
     setDuplicado(null);
+    setPreview(null);
+    setShowMapping(false);
+    setMapping({});
+    setSelectedTpv('');
   };
 
-  const handleUpload = async () => {
-    if (!file) return setError("Necesitas proporcionar un Excel a la app");
+  const handleFileSelect = async (selectedFile: File | null) => {
+    setFile(selectedFile);
+    setError(null);
+    setResult(null);
+    setDuplicado(null);
+    setShowMapping(false);
+    setMapping({});
+    setPreview(null);
+    setSelectedTpv('');
+
+    if (!selectedFile) return;
+
+    try {
+      const buffer = await selectedFile.arrayBuffer();
+      const { columns, data, suggestedType, suggestedMapping, missingColumns } = previewExcel(buffer);
+
+      const userId_ = userId;
+      if (suggestedType && userId_) {
+        const existingMappings = await fetchMappings(userId_, suggestedType);
+        if (existingMappings.length > 0) {
+          const savedMapping: Record<string, string> = {};
+          for (const m of existingMappings) {
+            savedMapping[m.original_column] = m.mapped_column;
+          }
+          const mappedCols = columns.map(c => savedMapping[c] || c);
+          try {
+            const tipo = detectTypeFromColumns(mappedCols);
+            if (tipo) {
+              setPreview({ columns, data, suggestedType: tipo, missingColumns: [] });
+              setMapping(savedMapping);
+              return;
+            }
+          } catch {}
+        }
+      }
+
+      setPreview({ columns, data, suggestedType, missingColumns });
+
+      if (suggestedType && missingColumns.length > 0) {
+        setMapping(suggestedMapping);
+        setShowMapping(true);
+      } else if (!suggestedType) {
+        setMapping(suggestedMapping);
+        setShowMapping(true);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error al leer el archivo');
+    }
+  };
+
+  const detectTypeFromColumns = (cols: string[]): ExcelType | null => {
+    const norm = cols.map(normalizeColumn);
+    const s = (v: string) => norm.includes(v);
+    if (s('producto') && s('ingrediente') && s('cantidad') && s('unidad') && s('precio_unidad')) return 'escandallo';
+    if (s('proveedor') && s('cif') && s('email') && s('telefono') && s('direccion')) return 'proveedores';
+    if (s('fecha') && s('producto') && s('cantidad_vendida') && s('precio_unitario') && s('total')) return 'ventas';
+    if (s('producto') && s('stock_actual') && s('stock_minimo') && s('fecha_ultima_compra')) return 'inventario';
+    return null;
+  };
+
+  const handleTpvChange = (tpvName: string) => {
+    setSelectedTpv(tpvName);
+    if (!tpvName || !preview) return;
+
+    const preset = TPV_PRESETS.find(p => p.name === tpvName);
+    if (!preset) return;
+
+    const newMapping: Record<string, string> = {};
+    const required = preview.suggestedType ? REQUIRED_COLUMNS[preview.suggestedType] : [];
+
+    for (const col of preview.columns) {
+      const norm = normalizeColumn(col);
+      let mapped = preset.mappings[norm] || '';
+      if (!mapped) {
+        for (const [key, val] of Object.entries(preset.mappings)) {
+          if (norm.includes(key) || key.includes(norm)) {
+            mapped = val;
+            break;
+          }
+        }
+      }
+      if (mapped && required.includes(mapped as any)) {
+        newMapping[col] = mapped;
+      }
+    }
+
+    const autoSuggest = suggestColumnMapping(preview.columns, preview.suggestedType || 'ventas');
+    for (const [col, mapped] of Object.entries(autoSuggest)) {
+      if (!newMapping[col]) {
+        newMapping[col] = mapped;
+      }
+    }
+
+    setMapping(newMapping);
+  };
+
+  const handleMappingChange = (originalCol: string, mappedCol: string) => {
+    setMapping(prev => {
+      const next = { ...prev };
+      if (mappedCol) {
+        next[originalCol] = mappedCol;
+      } else {
+        delete next[originalCol];
+      }
+      return next;
+    });
+  };
+
+  const handleStartUpload = async () => {
+    if (!file) return;
     setLoading(true);
     setError(null);
     setResult(null);
     setDuplicado(null);
+    setShowMapping(false);
 
     const formData = new FormData();
     formData.append("file", file);
+
+    if (Object.keys(mapping).length > 0) {
+      formData.append("mapping", JSON.stringify(mapping));
+    }
 
     try {
       const res = await fetch(`/api/excel/upload?save=true`, {
@@ -62,25 +223,18 @@ export default function SubirExcelPage() {
 
       if (res.status === 409) {
         const data = await res.json();
-        setDuplicado(data.detail || "Este archivo ya fue subido anteriormente");
+        setDuplicado(data.detail || data.error || "Este archivo ya fue subido anteriormente");
       } else if (!res.ok) {
         const errorMessage = await extractErrorMessage(res);
         setError(errorMessage);
       } else {
         const data = await res.json();
         setResult(data);
-        if (data.data && data.data.length > 0) {
-          const cols = Object.keys(data.data[0]);
-          const mapeadas = cols
-            .filter((col) => col.includes("_") || col !== col.toLowerCase())
-            .map((col) => ({
-              original: col.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()),
-              mapeado: COLUMN_LABELS[col] || col,
-            }));
-          if (mapeadas.length > 0) {
-            setMappingInfo(mapeadas);
-            setShowMappingModal(true);
-          }
+
+        if (userId && preview?.suggestedType && Object.keys(mapping).length > 0) {
+          try {
+            await saveMappingsBatch(userId, preview.suggestedType, mapping);
+          } catch {}
         }
       }
     } catch (err) {
@@ -96,6 +250,11 @@ export default function SubirExcelPage() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("force", "true");
+
+    if (Object.keys(mapping).length > 0) {
+      formData.append("mapping", JSON.stringify(mapping));
+    }
 
     try {
       const res = await fetch(`/api/excel/upload?force=true`, {
@@ -119,23 +278,30 @@ export default function SubirExcelPage() {
   const columns =
     result?.data && result.data.length > 0 ? Object.keys(result.data[0]) : [];
 
+  const requiredCols = preview?.suggestedType
+    ? [...REQUIRED_COLUMNS[preview.suggestedType]]
+    : [];
+
+  const unmappedCols = preview
+    ? preview.columns.filter(c => !mapping[c])
+    : [];
+
   if (!mounted) return null;
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "20px 0" }}>
-      {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 32, fontWeight: 700, color: "#1a1a2e", margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ 
-            display: "inline-flex", 
-            alignItems: "center", 
-            justifyContent: "center", 
-            width: 48, 
-            height: 48, 
-            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)", 
-            borderRadius: 12, 
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 48,
+            height: 48,
+            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
+            borderRadius: 12,
             fontSize: 24,
-            boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)" 
+            boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)"
           }}>
             📤
           </span>
@@ -146,12 +312,11 @@ export default function SubirExcelPage() {
         </p>
       </div>
 
-      {/* Dropzone Card */}
-      <div style={{ 
-        background: "white", 
-        borderRadius: 16, 
-        padding: 40, 
-        boxShadow: "0 2px 12px rgba(0,0,0,0.08)", 
+      <div style={{
+        background: "white",
+        borderRadius: 16,
+        padding: 40,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         marginBottom: 24,
         border: "1px solid #eee"
       }}>
@@ -195,7 +360,7 @@ export default function SubirExcelPage() {
           type="file"
           accept=".xlsx,.xls"
           style={{ display: "none" }}
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
         />
 
         {file && (
@@ -233,17 +398,62 @@ export default function SubirExcelPage() {
             </button>
           </div>
         )}
+
+        {preview && !showMapping && (
+          <div style={{
+            marginTop: 16,
+            padding: "16px 20px",
+            background: preview.missingColumns.length === 0 && preview.suggestedType ? "rgba(0, 138, 14, 0.05)" : "#fff8e1",
+            borderRadius: 12,
+            border: `1px solid ${preview.missingColumns.length === 0 && preview.suggestedType ? "#008A0E" : "#ffe082"}`,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#333" }}>
+                  {preview.suggestedType
+                    ? `Tipo detectado: ${EXCEL_TYPE_LABELS[preview.suggestedType]}`
+                    : "No se pudo detectar automáticamente el tipo de Excel"}
+                </p>
+                <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#666" }}>
+                  Columnas: {preview.columns.join(", ")}
+                </p>
+                {preview.missingColumns.length > 0 && preview.suggestedType && (
+                  <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#c0392b" }}>
+                    Faltan: {preview.missingColumns.join(", ")}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowMapping(true)}
+                style={{
+                  padding: "8px 16px",
+                  background: preview.missingColumns.length > 0 ? "linear-gradient(135deg, #293AFF 0%, #1A28CC 100%)" : "transparent",
+                  color: preview.missingColumns.length > 0 ? "white" : "#293AFF",
+                  border: preview.missingColumns.length > 0 ? "none" : "1px solid #293AFF",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {preview.missingColumns.length > 0 ? "Mapear columnas" : "Ajustar mapping"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Action Buttons */}
       <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
         <button
-          onClick={handleUpload}
-          disabled={loading || !file}
+          onClick={handleStartUpload}
+          disabled={loading || !file || (showMapping && unmappedCols.length > 0)}
           style={{
             flex: 1,
             padding: "14px 28px",
-            background: loading || !file ? "#aaa" : "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
+            background: loading || !file || (showMapping && unmappedCols.length > 0)
+              ? "#aaa"
+              : "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
             color: "white",
             borderRadius: 10,
             border: "none",
@@ -268,16 +478,16 @@ export default function SubirExcelPage() {
         >
           {loading ? (
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <span style={{ 
-                display: "inline-block", 
-                width: 20, 
-                height: 20, 
-                border: "3px solid rgba(255,255,255,0.3)", 
-                borderTopColor: "white", 
-                borderRadius: "50%", 
-                animation: "spin 1s linear infinite" 
+              <span style={{
+                display: "inline-block",
+                width: 20,
+                height: 20,
+                border: "3px solid rgba(255,255,255,0.3)",
+                borderTopColor: "white",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite"
               }}></span>
-              Procesando...
+              Subiendo...
             </span>
           ) : (
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
@@ -315,7 +525,6 @@ export default function SubirExcelPage() {
         </button>
       </div>
 
-      {/* Banner duplicado */}
       {duplicado && (
         <div style={{
           marginBottom: 24,
@@ -368,7 +577,6 @@ export default function SubirExcelPage() {
         </div>
       )}
 
-      {/* Error */}
       {error && (
         <div style={{
           marginBottom: 24,
@@ -378,17 +586,16 @@ export default function SubirExcelPage() {
           borderRadius: 12,
           color: "#c0392b",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 24 }}>❌</span>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <span style={{ fontSize: 24, flexShrink: 0 }}>❌</span>
             <div>
               <strong style={{ fontSize: 15 }}>Error:</strong>
-              <p style={{ margin: "4px 0 0 0", fontSize: 14 }}>{error}</p>
+              <p style={{ margin: "4px 0 0 0", fontSize: 14, whiteSpace: "pre-wrap" }}>{error}</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Banner éxito */}
       {result && (
         <div style={{
           marginBottom: 24,
@@ -410,15 +617,14 @@ export default function SubirExcelPage() {
         </div>
       )}
 
-      {/* Tabla de resultados */}
       {result?.data && result.data.length > 0 && (
         <div style={{ marginTop: 28 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: "#1a1a2e" }}>
             📊 Datos procesados
           </h2>
-          <div style={{ 
-            overflowX: "auto", 
-            borderRadius: 12, 
+          <div style={{
+            overflowX: "auto",
+            borderRadius: 12,
             border: "1px solid #e0e0e0",
             boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
           }}>
@@ -441,16 +647,16 @@ export default function SubirExcelPage() {
               </thead>
               <tbody>
                 {result.data.map((row: any, i: number) => (
-                  <tr key={i} style={{ 
+                  <tr key={i} style={{
                     background: i % 2 === 0 ? "white" : "#fafafa",
                     transition: "background 0.2s ease"
                   }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(0, 138, 14, 0.05)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "white" : "#fafafa";
-                  }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.background = "rgba(0, 138, 14, 0.05)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "white" : "#fafafa";
+                    }}
                   >
                     {columns.map((col) => (
                       <td key={col} style={{
@@ -472,8 +678,7 @@ export default function SubirExcelPage() {
         </div>
       )}
 
-      {/* Modal mapping */}
-      {showMappingModal && (
+      {showMapping && preview && (
         <div
           style={{
             position: "fixed",
@@ -484,69 +689,161 @@ export default function SubirExcelPage() {
             justifyContent: "center",
             zIndex: 1000,
           }}
-          onClick={() => setShowMappingModal(false)}
         >
           <div
             style={{
               background: "white",
               borderRadius: 16,
               padding: 32,
-              maxWidth: 500,
-              width: "90%",
+              maxWidth: 640,
+              width: "95%",
+              maxHeight: "90vh",
+              overflowY: "auto",
               boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginTop: 0, fontSize: 20, fontWeight: 700, color: "#1a1a2e" }}>
-              🔄 Columnas normalizadas automáticamente
+            <h3 style={{ marginTop: 0, fontSize: 20, fontWeight: 700, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
+              🔄 Mapear columnas
             </h3>
-            <p style={{ color: "#555", fontSize: 14, marginBottom: 20 }}>
-              Las siguientes columnas de tu Excel fueron renombradas para ser compatibles con el sistema:
+            <p style={{ color: "#555", fontSize: 14, marginBottom: 16 }}>
+              Asigna las columnas de tu Excel a los campos del sistema.
+              {preview.suggestedType && (
+                <> Tipo detectado: <strong>{EXCEL_TYPE_LABELS[preview.suggestedType]}</strong></>
+              )}
             </p>
-            <div style={{ 
-              background: "#f5f5f5", 
-              borderRadius: 12, 
-              padding: 16,
-              marginBottom: 20 
-            }}>
-              <table style={{ width: "100%", fontSize: 14 }}>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>
+                TPV / Software de gestión
+              </label>
+              <select
+                value={selectedTpv}
+                onChange={(e) => handleTpvChange(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  fontSize: 14,
+                  background: "white",
+                }}
+              >
+                <option value="">Sin TPV específico (detección automática)</option>
+                {TPV_PRESETS.filter(p => p.name !== 'custom').map(p => (
+                  <option key={p.name} value={p.name}>{p.label}</option>
+                ))}
+              </select>
+              <p style={{ margin: "4px 0 0 0", fontSize: 12, color: "#888" }}>
+                Selecciona tu TPV para rellenar automáticamente el mapeo
+              </p>
+            </div>
+
+            <div style={{ background: "#f5f5f5", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+              <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13 }}>Tu Excel</th>
-                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13 }}>Sistema</th>
+                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "40%" }}>Tu Excel</th>
+                    <th style={{ textAlign: "left", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "40%" }}>Campo del sistema</th>
+                    <th style={{ textAlign: "center", paddingBottom: 12, color: "#888", fontWeight: 600, fontSize: 13, width: "20%" }}>Obligatorio</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mappingInfo.map((m, i) => (
-                    <tr key={i}>
-                      <td style={{ padding: "8px 0", color: "#c0392b", fontSize: 14 }}>{m.original}</td>
-                      <td style={{ padding: "8px 0", color: "#008A0E", fontWeight: 500, fontSize: 14 }}>→ {m.mapeado}</td>
-                    </tr>
-                  ))}
+                  {preview.columns.map((col) => {
+                    const mapped = mapping[col] || '';
+                    const isRequired = requiredCols.includes(mapped);
+                    const isMissing = requiredCols.includes(mapped);
+                    return (
+                      <tr key={col}>
+                        <td style={{ padding: "6px 8px", color: "#333", fontWeight: 500 }}>
+                          {col}
+                        </td>
+                        <td style={{ padding: "6px 8px" }}>
+                          <select
+                            value={mapped}
+                            onChange={(e) => handleMappingChange(col, e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "6px 8px",
+                              borderRadius: 6,
+                              border: `1px solid ${mapped ? "#008A0E" : "#ddd"}`,
+                              fontSize: 13,
+                              background: mapped ? "rgba(0, 138, 14, 0.05)" : "white",
+                            }}
+                          >
+                            <option value="">— No usar —</option>
+                            {requiredCols.map((rc) => (
+                              <option key={rc} value={rc}>
+                                {SYSTEM_COLUMN_LABELS[rc] || rc}
+                              </option>
+                            ))}
+                            {mapped && !requiredCols.includes(mapped) && (
+                              <option value={mapped}>{SYSTEM_COLUMN_LABELS[mapped] || mapped}</option>
+                            )}
+                          </select>
+                        </td>
+                        <td style={{ padding: "6px 8px", textAlign: "center" }}>
+                          {requiredCols.includes(mapped) ? (
+                            <span style={{ color: "#008A0E", fontSize: 16 }}>✓</span>
+                          ) : requiredCols.includes(col) || preview.missingColumns.includes(normalizeColumn(col)) ? (
+                            <span style={{ color: "#c0392b", fontSize: 13 }}>⚠️</span>
+                          ) : (
+                            <span style={{ color: "#ccc" }}>—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-            <p style={{ marginTop: 16, fontSize: 13, color: "#888", fontStyle: "italic" }}>
-              Tus datos se han guardado correctamente.
-            </p>
-            <button
-              onClick={() => setShowMappingModal(false)}
-              style={{
-                marginTop: 20,
-                padding: "12px 32px",
-                background: "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: 10,
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: 15,
-                width: "100%",
-                boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
-              }}
-            >
-              ✓ Entendido
-            </button>
+
+            <div style={{
+              padding: 12,
+              background: unmappedCols.length > 5 ? "#fff8e1" : "rgba(0, 138, 14, 0.05)",
+              borderRadius: 8,
+              marginBottom: 20,
+              fontSize: 13,
+              color: unmappedCols.length > 5 ? "#7a5a00" : "#008A0E",
+            }}>
+              {unmappedCols.length > 0
+                ? `${unmappedCols.length} columna(s) sin mapear: ${unmappedCols.join(", ")}`
+                : "Todas las columnas están mapeadas correctamente"}
+            </div>
+
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowMapping(false)}
+                style={{
+                  padding: "10px 24px",
+                  background: "white",
+                  color: "#666",
+                  border: "1px solid #ddd",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  fontSize: 14,
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => setShowMapping(false)}
+                style={{
+                  padding: "10px 24px",
+                  background: "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
+                }}
+              >
+                ✓ Confirmar mapping
+              </button>
+            </div>
           </div>
         </div>
       )}

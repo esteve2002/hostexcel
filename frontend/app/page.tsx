@@ -247,33 +247,60 @@ export default function Home() {
     },
   ];
 
+  const heroSales = ventasEstaSemana.reduce((sum, v) => sum + (v.total || v.cantidad_vendida * v.precio_unitario), 0);
+  const heroAlerts = alertas.length;
+
   return (
     <div className="page-shell">
       <div className="dashboard-hero" style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "flex-end",
+        alignItems: "stretch",
+        gap: 24,
         marginBottom: 28,
       }}>
-        <div>
-          <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 4px", fontWeight: 600, letterSpacing: "0.6px", textTransform: "uppercase" }}>
-            Dashboard
-          </p>
-          <h1 style={{ fontSize: 42, margin: 0, letterSpacing: "-1px" }}>
-            Bienvenido, {restaurante || "usuario"}
-          </h1>
-          <p style={{ margin: "12px 0 0", color: "var(--text-secondary)", maxWidth: 560 }}>
-            Resumen operativo para controlar ventas, margen, stock y proveedores antes del siguiente servicio.
-          </p>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 220 }}>
+          <div>
+            <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "0 0 4px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              Dashboard operativo
+            </p>
+            <h1 style={{ fontSize: 42, margin: 0, letterSpacing: "-1px" }}>
+              Bienvenido, {restaurante || "usuario"}
+            </h1>
+            <p style={{ margin: "12px 0 0", color: "var(--text-secondary)", maxWidth: 560 }}>
+              Resumen operativo para controlar ventas, margen, stock y proveedores antes del siguiente servicio.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 18 }}>
+            <button onClick={() => router.push("/subir-excel")} className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }}>
+              📤 Subir Excel
+            </button>
+            <button onClick={() => router.push("/visualizar")} className="btn-secondary" style={{ padding: "10px 22px", fontSize: 13 }}>
+              📊 Ver datos
+            </button>
+            <span className="filter-chip" style={{ background: "rgba(31,91,87,0.08)", color: "var(--secondary)" }}>
+              Semana actual
+            </span>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={() => router.push("/subir-excel")} className="btn-primary" style={{ padding: "10px 22px", fontSize: 13 }}>
-            📤 Subir Excel
-          </button>
-          <button onClick={() => router.push("/visualizar")} className="btn-secondary" style={{ padding: "10px 22px", fontSize: 13 }}>
-            📊 Ver datos
-          </button>
-        </div>
+
+        <aside className="hero-side-panel">
+          <p className="hero-side-panel__eyebrow">Lectura rápida</p>
+          <p className="hero-side-panel__value">€{heroSales.toFixed(2)}</p>
+          <p className="hero-side-panel__text">Ventas acumuladas en la semana actual, con el mismo corte que la vista de análisis.</p>
+
+          <div className="hero-mini-grid">
+            <div className="hero-mini-card">
+              <p className="hero-mini-label">Top plato</p>
+              <p className="hero-mini-value">{platoMasRentable ? platoMasRentable.producto : "—"}</p>
+            </div>
+            <div className="hero-mini-card">
+              <p className="hero-mini-label">Alertas</p>
+              <p className="hero-mini-value">{heroAlerts}</p>
+            </div>
+          </div>
+        </aside>
       </div>
 
       {error && (
@@ -299,7 +326,7 @@ export default function Home() {
               <span style={{ fontSize: 20, opacity: 0.7 }}>{kpi.icon}</span>
             </div>
             <div style={{
-              fontSize: kpi.value.length > 12 ? 20 : 26,
+              fontSize: kpi.value.length > 12 ? 20 : 28,
               fontWeight: 700,
               fontFamily: "var(--font-display)",
               letterSpacing: "-0.3px",

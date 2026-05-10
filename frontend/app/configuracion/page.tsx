@@ -257,370 +257,191 @@ export default function ConfiguracionPage() {
 
   return (
     <div className="page-shell-compact stack-lg">
-      <div className="page-hero" style={{ marginBottom: 0 }}>
-        <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 48,
-            height: 48,
-            background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
-            borderRadius: 12,
-            fontSize: 24,
-            boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)"
-          }}>
-            ⚙️
-          </span>
-          CONFIGURACIÓN
-        </h1>
+      <div className="page-hero stack">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div className="code-pill status-soft" style={{ fontSize: 18 }}>⚙️</div>
+          <div>
+            <h1 className="page-title">Configuración</h1>
+            <p className="page-subtitle">Gestiona mappings, prueba archivos y revisa tu cuenta desde una sola pantalla.</p>
+          </div>
+        </div>
+        <div className="pill-tabs">
+          {([
+            { key: 'mappings', label: 'Mappings', icon: '🗺️' },
+            { key: 'tester', label: 'Probador', icon: '🧪' },
+            { key: 'account', label: 'Mi cuenta', icon: '👤' },
+          ] as const).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`pill-tab ${activeTab === tab.key ? 'active' : ''}`}
+            >
+              {tab.icon} {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {error && (
-        <div style={{
-          marginBottom: 24, padding: "16px 20px", background: "rgba(188,75,47,0.08)",
-          border: "1px solid rgba(188,75,47,0.18)", borderRadius: 12, color: "var(--primary)", fontSize: 14,
-        }}>
-          ❌ {error}
-        </div>
-      )}
-
-      {success && (
-        <div style={{
-          marginBottom: 24, padding: "16px 20px", background: "rgba(37,78,75,0.1)",
-          border: "1px solid var(--secondary)", borderRadius: 12, color: "var(--secondary)", fontSize: 14, fontWeight: 600,
-        }}>
-          ✅ {success}
-        </div>
-      )}
-
-      {/* Tabs principales */}
-      <div className="pill-tabs">
-        {([
-          { key: 'mappings', label: 'Mappings', icon: '🗺️' },
-          { key: 'tester', label: 'Probador', icon: '🧪' },
-          { key: 'account', label: 'Mi cuenta', icon: '👤' },
-        ] as const).map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`pill-tab ${activeTab === tab.key ? 'active' : ''}`}
-          >
-            {tab.icon} {tab.label}
-          </button>
-        ))}
-      </div>
+      {error && <div className="section-card section-card--pad status-error">❌ {error}</div>}
+      {success && <div className="section-card section-card--pad status-soft">✅ {success}</div>}
 
       {activeTab === 'mappings' && (
-        <>
-          {/* Coverage cards */}
+        <div className="stack-lg">
           <div className="metric-grid metric-grid-4">
-            {EXCEL_TYPES.map(type => {
+            {EXCEL_TYPES.map((type) => {
               const cov = getCoverage(type);
               return (
-                <div
+                <button
                   key={type}
                   onClick={() => setActiveType(type)}
-                  className="section-card section-card--pad"
-                  style={{ padding: 16, cursor: "pointer", borderColor: activeType === type ? "var(--primary)" : "var(--border-light)" }}
+                  className="section-card section-card--pad card-hover"
+                  style={{ textAlign: 'left', cursor: 'pointer', borderColor: activeType === type ? 'var(--primary)' : 'var(--border-light)' }}
                 >
-                  <div style={{ fontSize: 20, marginBottom: 4 }}>{TYPE_ICONS[type]}</div>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)" }}>
-                    {EXCEL_TYPE_LABELS[type]}
+                  <div className="code-pill status-soft" style={{ marginBottom: 10 }}>{TYPE_ICONS[type]}</div>
+                  <div style={{ fontWeight: 700, marginBottom: 8 }}>{EXCEL_TYPE_LABELS[type]}</div>
+                  <div style={{ height: 6, borderRadius: 999, background: 'rgba(80,55,42,0.1)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${cov.percent}%`, background: cov.percent === 100 ? 'var(--secondary)' : cov.percent >= 60 ? 'var(--accent)' : 'var(--primary)' }} />
                   </div>
-                  <div style={{
-                    marginTop: 8, height: 6, background: "rgba(80,55,42,0.1)", borderRadius: 3, overflow: "hidden",
-                  }}>
-                    <div style={{
-                      height: "100%", width: `${cov.percent}%`,
-                      background: cov.percent === 100 ? "var(--secondary)" : cov.percent >= 60 ? "var(--accent)" : "var(--primary)",
-                      borderRadius: 3, transition: "width 0.3s ease",
-                    }} />
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>
-                    {cov.mapped}/{cov.total} campos
-                  </div>
-                </div>
+                  <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>{cov.mapped}/{cov.total} campos</div>
+                </button>
               );
             })}
           </div>
 
-          {/* Mapping management */}
           <div className="section-card section-card--pad stack-lg">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <div>
-                <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
-                  {TYPE_ICONS[activeType]} Mappings de {EXCEL_TYPE_LABELS[activeType]}
-                </h2>
-                <p style={{ margin: "4px 0 0 0", color: "var(--text-muted)", fontSize: 13 }}>
-                  {mappings.length} mapeo{mappings.length !== 1 ? 's' : ''} guardado{mappings.length !== 1 ? 's' : ''}
-                </p>
+                <h2 style={{ margin: 0, fontSize: 22 }}>{TYPE_ICONS[activeType]} Mappings de {EXCEL_TYPE_LABELS[activeType]}</h2>
+                <p className="page-subtitle" style={{ marginTop: 6 }}>{mappings.length} mapping{mappings.length !== 1 ? 's' : ''} guardado{mappings.length !== 1 ? 's' : ''}</p>
               </div>
               <div className="page-toolbar">
-                <button onClick={exportMappings}
-                  className="ghost-button"
-                >
-                  📤 Exportar
-                </button>
-                <button onClick={importMappings}
-                  className="ghost-button"
-                >
-                  📥 Importar
-                </button>
+                <button onClick={exportMappings} className="ghost-button">📤 Exportar</button>
+                <button onClick={importMappings} className="ghost-button">📥 Importar</button>
               </div>
             </div>
 
             {loading ? (
-              <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Cargando mappings...</p>
+              <p className="page-subtitle" style={{ margin: 0 }}>Cargando mappings...</p>
             ) : mappings.length === 0 ? (
-              <div className="subtle-list" style={{ textAlign: "center" }}>
+              <div className="subtle-list" style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>{TYPE_ICONS[activeType]}</div>
-                <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 8 }}>
-                  No tienes mappings guardados para {EXCEL_TYPE_LABELS[activeType].toLowerCase()}.
-                </p>
-                <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>
-                  Los mappings se crean automáticamente cuando subes un Excel y configuras las columnas en el mapeo interactivo.
-                </p>
-                <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                  También puedes subir un Excel en la pestaña <strong>Probador</strong> para generar mappings de prueba.
-                </p>
+                <p style={{ margin: '0 0 8px', color: 'var(--text-secondary)' }}>No tienes mappings guardados para {EXCEL_TYPE_LABELS[activeType].toLowerCase()}.</p>
+                <p style={{ margin: '0 0 16px', color: 'var(--text-muted)' }}>Los mappings se crean automáticamente al subir archivos y configurar columnas.</p>
+                <p style={{ margin: 0, color: 'var(--text-muted)' }}>También puedes usar la pestaña <strong>Probador</strong>.</p>
               </div>
             ) : (
-              <div>
+              <div className="stack">
                 {mappings.map((m, idx) => (
-                  <div key={m.id || idx} style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "14px 16px",
-                    borderBottom: idx < mappings.length - 1 ? "1px solid rgba(80,55,42,0.08)" : "none",
-                    transition: "background 0.2s ease",
-                  }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,248,236,0.7)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <div style={{
-                      flex: 1, display: "flex", alignItems: "center", gap: 12,
-                    }}>
-                      <div style={{
-                        background: "rgba(188,75,47,0.08)", color: "var(--primary)", padding: "6px 12px",
-                        borderRadius: 8, fontWeight: 600, fontSize: 14, flexShrink: 0, maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                      }}>
-                        {m.original_column}
-                      </div>
-                      <span style={{ color: "#ccc", fontSize: 18 }}>⟶</span>
-                      <div style={{
-                        background: "rgba(37,78,75,0.1)", color: "var(--secondary)", padding: "6px 12px",
-                        borderRadius: 8, fontWeight: 600, fontSize: 14, flexShrink: 0,
-                      }}>
-                        {SYSTEM_COLUMN_LABELS[m.mapped_column] || m.mapped_column}
-                      </div>
-                      <span style={{ color: "#aaa", fontSize: 12 }}>
-                        ({m.mapped_column})
-                      </span>
+                  <div key={m.id || idx} className="section-card" style={{ padding: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1, flexWrap: 'wrap' }}>
+                      <span className="code-pill status-error" style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.original_column}</span>
+                      <span style={{ color: 'var(--text-muted)' }}>→</span>
+                      <span className="code-pill status-soft">{SYSTEM_COLUMN_LABELS[m.mapped_column] || m.mapped_column}</span>
+                      <span className="page-subtitle" style={{ margin: 0, fontSize: 12 }}>({m.mapped_column})</span>
                     </div>
-                    <button
-                      onClick={() => m.id && handleDeleteMapping(m.id)}
-                      style={{
-                        background: "none", border: "none", color: "#ccc", cursor: "pointer",
-                        fontSize: 16, padding: "6px 10px", borderRadius: 6,
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgba(192, 57, 43, 0.1)";
-                        e.currentTarget.style.color = "#c0392b";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "#ccc";
-                      }}
-                      title="Eliminar mapping"
-                    >
-                      🗑️
-                    </button>
+                    <button onClick={() => m.id && handleDeleteMapping(m.id)} className="ghost-button" title="Eliminar mapping">🗑️</button>
                   </div>
                 ))}
               </div>
             )}
 
-              <button onClick={handleAddMapping} className="accent-button" style={{ marginTop: 16 }}>
-                + Añadir mapping manual
-              </button>
+            <button onClick={handleAddMapping} className="accent-button" style={{ alignSelf: 'flex-start' }}>+ Añadir mapping manual</button>
           </div>
 
-          {/* TPV Presets */}
           <div className="section-card section-card--pad stack-lg">
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
-              🏪 Presets para {EXCEL_TYPE_LABELS[activeType]}
-            </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>
-              Estos son los mapeos típicos para cada TPV. Selecciona tu TPV al subir un Excel y se aplicarán automáticamente.
-            </p>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 20 }}>🏪 Presets para {EXCEL_TYPE_LABELS[activeType]}</h2>
+              <p className="page-subtitle">Mapeos típicos por TPV. Se aplican como base antes del ajuste manual.</p>
+            </div>
 
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              {presetsForType.map(p => (
-                <div key={p.name} style={{
-                  flex: "1 1 240px", borderRadius: 18,
-                  padding: 16, border: "1px solid var(--border-light)",
-                  background: "rgba(255, 248, 236, 0.72)",
-                }}>
-                  <h3 style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)", marginTop: 0, marginBottom: 12 }}>
-                    {p.label}
-                  </h3>
-                  {Object.entries(p.mappings).map(([original, mapped]) => (
-                    <div key={original} style={{
-                      display: "flex", alignItems: "center", gap: 8, marginBottom: 6,
-                      fontSize: 13,
-                    }}>
-                      <span style={{ color: "var(--primary)", fontWeight: 500, flex: 1 }}>{original}</span>
-                      <span style={{ color: "var(--text-muted)" }}>→</span>
-                      <span style={{ color: "var(--secondary)", fontWeight: 500, flex: 1 }}>
-                        {SYSTEM_COLUMN_LABELS[mapped] || mapped}
-                      </span>
-                    </div>
-                  ))}
+            <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+              {presetsForType.map((p) => (
+                <div key={p.name} className="section-card section-card--pad" style={{ background: 'rgba(255,248,236,0.72)' }}>
+                  <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 15 }}>{p.label}</h3>
+                  <div className="stack" style={{ gap: 8 }}>
+                    {Object.entries(p.mappings).map(([original, mapped]) => (
+                      <div key={original} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                        <span style={{ color: 'var(--primary)', fontWeight: 600, flex: 1 }}>{original}</span>
+                        <span style={{ color: 'var(--text-muted)' }}>→</span>
+                        <span style={{ color: 'var(--secondary)', fontWeight: 600, flex: 1 }}>{SYSTEM_COLUMN_LABELS[mapped] || mapped}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-
-            <p style={{ color: "var(--text-muted)", fontSize: 12, fontStyle: "italic", marginTop: 16 }}>
-              ¿Tu TPV no aparece? Sube un Excel, usa el mapeo interactivo, y el sistema lo recordará automáticamente.
-            </p>
           </div>
-        </>
+        </div>
       )}
 
       {activeTab === 'tester' && (
         <div className="section-card section-card--pad stack-lg">
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
-            🧪 Probador de mappings
-          </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>
-            Sube un Excel de prueba para ver cómo se transformarían sus columnas con tus mappings actuales.
-            No se guarda ningún dato, solo es una previsualización.
-          </p>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 22 }}>🧪 Probador de mappings</h2>
+            <p className="page-subtitle">Sube un Excel de prueba para ver cómo se transformarían sus columnas sin guardar datos.</p>
+          </div>
 
-          <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", display: "block", marginBottom: 8 }}>
-              Tipo de Excel a probar
-            </label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {EXCEL_TYPES.map(type => (
-                <button
-                  key={type}
-                  onClick={() => setActiveType(type)}
-                  style={{
-                    padding: "8px 16px",
-                    background: activeType === type ? "var(--primary)" : "rgba(255,252,246,0.85)",
-                    color: activeType === type ? "white" : "var(--text-secondary)",
-                    border: "none", borderRadius: 8, cursor: "pointer",
-                    fontWeight: 600, fontSize: 13, transition: "all 0.2s ease",
-                  }}
-                >
+          <div>
+            <label style={{ display: 'block', marginBottom: 10, fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>Tipo de Excel a probar</label>
+            <div className="page-toolbar">
+              {EXCEL_TYPES.map((type) => (
+                <button key={type} onClick={() => setActiveType(type)} className={activeType === type ? 'btn-primary' : 'ghost-button'}>
                   {TYPE_ICONS[type]} {EXCEL_TYPE_LABELS[type]}
                 </button>
               ))}
             </div>
           </div>
 
-            <div className="upload-dropzone" style={{ marginBottom: 20, background: testFile ? "rgba(37,78,75,0.08)" : undefined }}
-              onClick={() => fileInputRef.current?.click()}
-            >
-            <div style={{ fontSize: 40, marginBottom: 8 }}>
-              {testLoading ? '⏳' : testFile ? '✅' : '📂'}
-            </div>
-            <p style={{ fontSize: 14, color: "var(--text-primary)", fontWeight: 600, marginBottom: 4 }}>
-              {testFile ? testFile.name : 'Sube un Excel de prueba'}
-            </p>
-            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              {testFile ? `${(testFile.size / 1024).toFixed(1)} KB` : 'Solo se leerán las columnas, no se guarda nada'}
-            </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls"
-              style={{ display: "none" }}
-              onChange={(e) => handleTestUpload(e.target.files?.[0] || null)}
-            />
+          <div className="upload-dropzone" style={{ background: testFile ? 'rgba(31,91,87,0.08)' : undefined }} onClick={() => fileInputRef.current?.click()}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>{testLoading ? '⏳' : testFile ? '✅' : '📂'}</div>
+            <p style={{ margin: '0 0 4px', fontWeight: 700 }}>{testFile ? testFile.name : 'Sube un Excel de prueba'}</p>
+            <p className="page-subtitle" style={{ margin: 0 }}>{testFile ? `${(testFile.size / 1024).toFixed(1)} KB` : 'Solo se leerán las columnas, no se guarda nada'}</p>
+            <input ref={fileInputRef} type="file" accept=".xlsx,.xls" style={{ display: 'none' }} onChange={(e) => handleTestUpload(e.target.files?.[0] || null)} />
           </div>
 
-          {testLoading && <p style={{ color: "var(--text-muted)", textAlign: "center" }}>Analizando archivo...</p>}
+          {testLoading && <p className="page-subtitle" style={{ margin: 0, textAlign: 'center' }}>Analizando archivo...</p>}
 
           {testResult && (
-            <div>
-              <div className="section-card section-card--pad" style={{ marginBottom: 20 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: "var(--text-primary)" }}>
-                  🔄 Transformación de columnas
-                </h3>
-                <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "2px solid #ddd" }}>
-                      <th style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600, color: "var(--primary)" }}>
-                        Tu columna
-                      </th>
-                      <th style={{ textAlign: "center", padding: "8px 12px", fontWeight: 600, color: "var(--text-muted)" }}>
-                        
-                      </th>
-                      <th style={{ textAlign: "left", padding: "8px 12px", fontWeight: 600, color: "var(--secondary)" }}>
-                        Se transforma a
-                      </th>
-                      <th style={{ textAlign: "center", padding: "8px 12px", fontWeight: 600, color: "var(--text-muted)", width: 80 }}>
-                        Mapping
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {testResult.before.map((col, i) => {
-                      const after = testResult.after[i];
-                      const changed = col !== after;
-                      return (
-                        <tr key={i} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                          <td style={{
-                            padding: "10px 12px", color: "#333", fontWeight: 500,
-                            fontStyle: changed ? "normal" : "italic",
-                          }}>
-                            {col}
-                          </td>
-                          <td style={{ padding: "10px 12px", textAlign: "center", color: "#ccc" }}>
-                            {changed ? '→' : '='}
-                          </td>
-                          <td style={{
-                            padding: "10px 12px",
-                            color: changed ? "var(--secondary)" : "var(--text-muted)",
-                            fontWeight: changed ? 600 : 400,
-                          }}>
-                            {after}
-                            {after && SYSTEM_COLUMN_LABELS[after] && (
-                              <span style={{ color: "#aaa", fontSize: 12, marginLeft: 6 }}>
-                                ({SYSTEM_COLUMN_LABELS[after]})
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ padding: "10px 12px", textAlign: "center" }}>
-                            {changed ? (
-                              <span style={{ color: "var(--secondary)", fontSize: 16 }}>✓</span>
-                            ) : (
-                              <span style={{ color: "#ccc", fontSize: 12 }}>—</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            <div className="stack-lg">
+              <div className="section-card section-card--pad">
+                <h3 style={{ marginTop: 0, marginBottom: 16, fontSize: 16 }}>🔄 Transformación de columnas</h3>
+                <div style={{ overflowX: 'auto' }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: '12px 14px', textAlign: 'left' }}>Tu columna</th>
+                        <th style={{ padding: '12px 14px', textAlign: 'center' }}></th>
+                        <th style={{ padding: '12px 14px', textAlign: 'left' }}>Se transforma a</th>
+                        <th style={{ padding: '12px 14px', textAlign: 'center', width: 80 }}>Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {testResult.before.map((col, i) => {
+                        const after = testResult.after[i];
+                        const changed = col !== after;
+                        return (
+                          <tr key={i}>
+                            <td style={{ padding: '12px 14px', fontStyle: changed ? 'normal' : 'italic' }}>{col}</td>
+                            <td style={{ padding: '12px 14px', textAlign: 'center' }}>{changed ? '→' : '='}</td>
+                            <td style={{ padding: '12px 14px', color: changed ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: changed ? 700 : 400 }}>
+                              {after}{after && SYSTEM_COLUMN_LABELS[after] ? <span style={{ color: 'var(--text-muted)', marginLeft: 6, fontSize: 12 }}>({SYSTEM_COLUMN_LABELS[after]})</span> : null}
+                            </td>
+                            <td style={{ padding: '12px 14px', textAlign: 'center' }}>{changed ? '✓' : '—'}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-                <div className="section-card section-card--pad" style={{
-                  padding: 16,
-                  background: testResult.after.some((c, i) => c !== testResult.before[i])
-                    ? "rgba(37,78,75,0.08)" : "rgba(255,252,246,0.85)",
-                }}>
-                <p style={{ margin: 0, fontSize: 14, color: "var(--text-primary)" }}>
+              <div className={`section-card section-card--pad ${testResult.after.some((c, i) => c !== testResult.before[i]) ? 'status-soft' : ''}`}>
+                <p style={{ margin: 0, fontWeight: 600 }}>
                   {testResult.after.some((c, i) => c !== testResult.before[i])
                     ? '✅ Tus mappings transformarán las columnas correctamente.'
                     : 'ℹ️ Ninguna columna necesita transformación con tus mappings actuales.'}
                 </p>
-                <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "var(--text-muted)" }}>
-                  {testResult.data.length} filas leídas • {testResult.before.length} columnas detectadas
-                </p>
+                <p className="page-subtitle" style={{ marginBottom: 0 }}>{testResult.data.length} filas leídas • {testResult.before.length} columnas detectadas</p>
               </div>
             </div>
           )}
@@ -629,70 +450,38 @@ export default function ConfiguracionPage() {
 
       {activeTab === 'account' && (
         <div className="section-card section-card--pad stack-lg">
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: 8 }}>
-            👤 Mi cuenta
-          </h2>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 22 }}>👤 Mi cuenta</h2>
+            <p className="page-subtitle">Datos de acceso y estado de tu cuenta.</p>
+          </div>
 
-          <div className="section-card section-card--pad" style={{ marginBottom: 20, background: "rgba(255,248,236,0.82)" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-              <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Restaurante
-                </label>
-                  <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
-                  {userData?.nombre_restaurante || '—'}
-                </p>
+          <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+            {[
+              ['Restaurante', userData?.nombre_restaurante || '—'],
+              ['Email', userData?.email || '—'],
+              ['Plan', userData?.plan || 'Gratuito'],
+              ['Miembro desde', userData?.created_at ? new Date(userData.created_at).toLocaleDateString('es-ES') : '—'],
+            ].map(([label, value]) => (
+              <div key={label} className="section-card section-card--pad">
+                <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>{label}</div>
+                <div style={{ marginTop: 6, fontWeight: 700 }}>{value}</div>
               </div>
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Email
-                </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
-                  {userData?.email || '—'}
-                </p>
-              </div>
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Plan
-                </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
-                  {userData?.plan || 'Gratuito'}
-                </p>
-              </div>
-              <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Miembro desde
-                </label>
-                <p style={{ margin: "4px 0 0 0", fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
-                  {userData?.created_at ? new Date(userData.created_at).toLocaleDateString('es-ES') : '—'}
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="section-card section-card--pad">
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginTop: 0, marginBottom: 12, color: "var(--text-primary)" }}>
-              📊 Resumen de mappings
-            </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-              {EXCEL_TYPES.map(type => {
+            <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 16 }}>📊 Resumen de mappings</h3>
+            <div className="metric-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+              {EXCEL_TYPES.map((type) => {
                 const cov = getCoverage(type);
                 return (
-                    <div key={type} style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 12px", background: "rgba(255,252,246,0.9)", borderRadius: 14, border: "1px solid var(--border-light)" }}>
-                    <span style={{ fontSize: 20 }}>{TYPE_ICONS[type]}</span>
+                  <div key={type} className="section-card section-card--pad" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="code-pill status-soft">{TYPE_ICONS[type]}</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: "var(--text-primary)" }}>{EXCEL_TYPE_LABELS[type]}</div>
-                      <div style={{ fontSize: 12, color: cov.percent === 100 ? "var(--secondary)" : "var(--text-muted)" }}>
-                        {cov.mapped}/{cov.total} campos mapeados
-                      </div>
+                      <div style={{ fontWeight: 700 }}>{EXCEL_TYPE_LABELS[type]}</div>
+                      <div className="page-subtitle" style={{ margin: '2px 0 0', fontSize: 12 }}>{cov.mapped}/{cov.total} campos mapeados</div>
                     </div>
-                      <div style={{
-                        background: cov.percent === 100 ? "var(--secondary)" : cov.percent >= 60 ? "var(--accent)" : "var(--primary)",
-                      color: "white", borderRadius: 20, padding: "2px 10px",
-                      fontSize: 12, fontWeight: 700,
-                    }}>
-                      {cov.percent}%
-                    </div>
+                    <div className="code-pill status-soft">{cov.percent}%</div>
                   </div>
                 );
               })}

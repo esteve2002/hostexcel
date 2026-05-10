@@ -290,250 +290,97 @@ export default function SubirExcelPage() {
 
   return (
     <div className="page-shell-compact stack-lg">
-      <div className="page-hero" style={{ marginBottom: 0 }}>
-        <h1 className="page-title" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 48,
-            height: 48,
-            background: "linear-gradient(135deg, #008A0E 0%, #293AFF 100%)",
-            borderRadius: 12,
-            fontSize: 24,
-            boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)"
-          }}>
-            📤
-          </span>
-          SUBIDA DE EXCELS
-        </h1>
-        <p className="page-subtitle" style={{ marginLeft: 60 }}>
-          Sube tu archivo Excel para analizar y gestionar los datos de tu restaurante
-        </p>
+      <div className="page-hero stack">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div className="code-pill status-soft" style={{ fontSize: 18 }}>📤</div>
+          <div>
+            <h1 className="page-title">Subida de Excels</h1>
+            <p className="page-subtitle">Sube tu archivo para analizarlo, mapearlo y guardarlo sin fricción.</p>
+          </div>
+        </div>
       </div>
 
       <div className="section-card section-card--pad stack-lg">
         <label
           htmlFor="fileInput"
           className="upload-dropzone"
-          style={{ borderColor: file ? "var(--secondary)" : undefined, background: file ? "rgba(37,78,75,0.08)" : undefined }}
-          onMouseEnter={(e) => {
-            if (!file) {
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)";
-              (e.currentTarget as HTMLElement).style.background = "rgba(188,75,47,0.06)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!file) {
-              (e.currentTarget as HTMLElement).style.borderColor = "rgba(80,55,42,0.2)";
-              (e.currentTarget as HTMLElement).style.background = "rgba(255,248,236,0.72)";
-            }
-          }}
+          style={{ borderColor: file ? 'var(--secondary)' : undefined, background: file ? 'rgba(31,91,87,0.08)' : undefined }}
         >
-          <div style={{ fontSize: 64, marginBottom: 16 }}>
-            {file ? "✅" : "📂"}
-          </div>
-          <p style={{ fontSize: 18, color: "var(--text-primary)", fontWeight: 600, marginBottom: 8 }}>
-            {file ? "Archivo seleccionado" : "Arrastra un archivo o haz clic aquí"}
-          </p>
-          <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
-            Formatos soportados: .xlsx, .xls
-          </p>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>{file ? '✅' : '📂'}</div>
+          <p style={{ fontSize: 18, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 8 }}>{file ? 'Archivo seleccionado' : 'Arrastra un archivo o haz clic aquí'}</p>
+          <p className="page-subtitle" style={{ margin: 0 }}>Formatos soportados: .xlsx, .xls</p>
         </label>
         <input
           id="fileInput"
           type="file"
           accept=".xlsx,.xls"
-            style={{ display: "none" }}
-            onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
-          />
+          style={{ display: 'none' }}
+          onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+        />
 
         {file && (
-          <div className="section-card" style={{ marginTop: 20, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(37,78,75,0.08)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className="section-card section-card--pad status-soft" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{ fontSize: 24 }}>📄</span>
               <div>
-                <p style={{ margin: 0, fontWeight: 600, color: "var(--secondary)", fontSize: 15 }}>{file.name}</p>
-                <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 13, marginTop: 2 }}>
+                <p style={{ margin: 0, fontWeight: 700, color: 'var(--secondary)', fontSize: 15 }}>{file.name}</p>
+                <p className="page-subtitle" style={{ margin: '2px 0 0', fontSize: 13 }}>
                   {(file.size / 1024).toFixed(2)} KB
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setFile(null)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "var(--text-muted)",
-                cursor: "pointer",
-                fontSize: 20,
-                padding: 4,
-              }}
-            >
-              ✕
-            </button>
+            <button onClick={() => setFile(null)} className="ghost-button">✕</button>
           </div>
         )}
 
         {preview && !showMapping && (
-          <div className="section-card" style={{ marginTop: 16, padding: "16px 20px", background: preview.missingColumns.length === 0 && preview.suggestedType ? "rgba(37,78,75,0.08)" : "rgba(230,177,93,0.12)" }}>
+          <div className={`section-card section-card--pad ${preview.missingColumns.length === 0 && preview.suggestedType ? 'status-soft' : 'status-warn'}`}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "#333" }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>
                   {preview.suggestedType
                     ? `Tipo detectado: ${EXCEL_TYPE_LABELS[preview.suggestedType]}`
                   : "No se pudo detectar automáticamente el tipo de Excel"}
                 </p>
-                <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "var(--text-secondary)" }}>
+                <p className="page-subtitle" style={{ margin: '4px 0 0', fontSize: 13 }}>
                   Columnas: {preview.columns.join(", ")}
                 </p>
                 {preview.missingColumns.length > 0 && preview.suggestedType && (
-                  <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "var(--primary)" }}>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--primary)' }}>
                     Faltan: {preview.missingColumns.join(", ")}
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => setShowMapping(true)}
-                style={{
-                  padding: "8px 16px",
-                  background: preview.missingColumns.length > 0 ? "var(--primary)" : "transparent",
-                  color: preview.missingColumns.length > 0 ? "white" : "var(--primary)",
-                  border: preview.missingColumns.length > 0 ? "none" : "1px solid var(--primary)",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: 13,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {preview.missingColumns.length > 0 ? "Mapear columnas" : "Ajustar mapping"}
+              <button onClick={() => setShowMapping(true)} className={preview.missingColumns.length > 0 ? 'btn-primary' : 'ghost-button'}>
+                {preview.missingColumns.length > 0 ? 'Mapear columnas' : 'Ajustar mapping'}
               </button>
             </div>
           </div>
         )}
       </div>
 
-      <div className="page-toolbar" style={{ marginBottom: 24 }}>
-        <button
-          onClick={handleStartUpload}
-          disabled={loading || !file || (showMapping && !allRequiredMapped)}
-          style={{
-            flex: 1,
-            padding: "14px 28px",
-            background: loading || !file || (showMapping && !allRequiredMapped)
-              ? "#aaa"
-              : "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
-            color: "white",
-            borderRadius: 10,
-            border: "none",
-            cursor: loading || !file ? "not-allowed" : "pointer",
-            fontSize: 16,
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-            boxShadow: loading || !file ? "none" : "0 4px 12px rgba(37, 78, 75, 0.3)",
-          }}
-          onMouseEnter={(e) => {
-            if (!loading && file) {
-              (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 6px 16px rgba(0, 138, 14, 0.4)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!loading && file) {
-              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0, 138, 14, 0.3)";
-            }
-          }}
-        >
+      <div className="page-toolbar">
+        <button onClick={handleStartUpload} disabled={loading || !file || (showMapping && !allRequiredMapped)} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
           {loading ? (
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <span style={{
-                display: "inline-block",
-                width: 20,
-                height: 20,
-                border: "3px solid rgba(255,255,255,0.3)",
-                borderTopColor: "white",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite"
-              }}></span>
-              Subiendo...
-            </span>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><span style={{ display: 'inline-block', width: 20, height: 20, border: '3px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />Subiendo...</span>
           ) : (
-              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                <span>🚀</span> SUBIR EXCEL
-              </span>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>🚀 SUBIR EXCEL</span>
           )}
         </button>
 
-        <button
-          onClick={cleanAll}
-          disabled={!hasContent}
-          style={{
-            padding: "14px 28px",
-            background: !hasContent ? "#aaa" : "rgba(255,252,246,0.9)",
-            color: !hasContent ? "white" : "var(--primary)",
-            borderRadius: 10,
-            border: !hasContent ? "none" : "2px solid var(--primary)",
-            cursor: !hasContent ? "not-allowed" : "pointer",
-            fontSize: 16,
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            if (hasContent) {
-                (e.currentTarget as HTMLElement).style.background = "rgba(188,75,47,0.08)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (hasContent) {
-                (e.currentTarget as HTMLElement).style.background = "rgba(255,252,246,0.9)";
-            }
-          }}
-        >
-          🧹 LIMPIAR
-        </button>
+        <button onClick={cleanAll} disabled={!hasContent} className="ghost-button" style={{ paddingInline: 24 }}>🧹 LIMPIAR</button>
       </div>
 
       {duplicado && (
-        <div className="section-card section-card--pad" style={{ marginBottom: 24, background: "rgba(230,177,93,0.12)", color: "#7a5a00" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div className="section-card section-card--pad status-warn">
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
             <span style={{ fontSize: 24 }}>⚠️</span>
             <div style={{ flex: 1 }}>
-              <p style={{ margin: "0 0 12px 0", fontWeight: 600, fontSize: 15 }}>Datos existentes detectados</p>
-              <p style={{ margin: "0 0 16px 0", fontSize: 14 }}>{duplicado}</p>
-              <div style={{ display: "flex", gap: 12 }}>
-                <button
-                  onClick={handleForce}
-                  style={{
-                    padding: "10px 24px",
-                    background: "linear-gradient(135deg, #293AFF 0%, #1A28CC 100%)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    fontWeight: 600,
-                    fontSize: 14,
-                    boxShadow: "0 4px 12px rgba(41, 58, 255, 0.3)",
-                  }}
-                >
-                  🔄 Sobreescribir
-                </button>
-                <button
-                  onClick={() => setDuplicado(null)}
-                  style={{
-                    padding: "10px 24px",
-                    background: "white",
-                    color: "#666",
-                    border: "1px solid #ddd",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    fontWeight: 500,
-                    fontSize: 14,
-                  }}
-                >
-                  Cancelar
-                </button>
+              <p style={{ margin: '0 0 12px', fontWeight: 700, fontSize: 15 }}>Datos existentes detectados</p>
+              <p style={{ margin: '0 0 16px', fontSize: 14 }}>{duplicado}</p>
+              <div className="page-toolbar">
+                <button onClick={handleForce} className="btn-primary">🔄 Sobreescribir</button>
+                <button onClick={() => setDuplicado(null)} className="ghost-button">Cancelar</button>
               </div>
             </div>
           </div>
@@ -541,158 +388,70 @@ export default function SubirExcelPage() {
       )}
 
       {error && (
-        <div style={{
-          marginBottom: 24,
-          padding: "20px 24px",
-          background: "#fff0f0",
-          border: "1px solid #f5c6c6",
-          borderRadius: 12,
-          color: "#c0392b",
-        }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <div className="section-card section-card--pad status-error">
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
             <span style={{ fontSize: 24, flexShrink: 0 }}>❌</span>
             <div>
               <strong style={{ fontSize: 15 }}>Error:</strong>
-              <p style={{ margin: "4px 0 0 0", fontSize: 14, whiteSpace: "pre-wrap" }}>{error}</p>
+              <p style={{ margin: '4px 0 0', fontSize: 14, whiteSpace: 'pre-wrap' }}>{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {result && (
-        <div style={{
-          marginBottom: 24,
-          padding: "20px 24px",
-          background: "rgba(0, 138, 14, 0.1)",
-          border: "1px solid #008A0E",
-          borderRadius: 12,
-          color: "#008A0E",
-          fontWeight: 600,
-          fontSize: 15,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="section-card section-card--pad status-soft">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 24 }}>✅</span>
             <div>
-              Archivo subido correctamente — Tipo detectado:{" "}
-              <span style={{ textTransform: "capitalize", fontWeight: 700 }}>{result.tipo}</span>
+              Archivo subido correctamente — Tipo detectado:{' '}
+              <span style={{ textTransform: 'capitalize', fontWeight: 700 }}>{result.tipo}</span>
             </div>
           </div>
         </div>
       )}
 
       {result?.data && result.data.length > 0 && (
-        <div style={{ marginTop: 28 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16, color: "#1a1a2e" }}>
-            📊 Datos procesados
-          </h2>
-          <div style={{
-            overflowX: "auto",
-            borderRadius: 12,
-            border: "1px solid #e0e0e0",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
-          }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+        <div className="section-card section-card--pad stack">
+          <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>📊 Datos procesados</h2>
+          <div style={{ overflowX: 'auto' }}>
+            <table>
               <thead>
-                <tr style={{ background: "#f5f5f5" }}>
+                <tr>
                   {columns.map((col) => (
-                    <th key={col} style={{
-                      padding: "14px 18px",
-                      textAlign: "left",
-                      fontWeight: 600,
-                      borderBottom: "2px solid #e0e0e0",
-                      whiteSpace: "nowrap",
-                      color: "#333",
-                    }}>
-                      {COLUMN_LABELS[col] || col}
-                    </th>
+                    <th key={col} style={{ padding: '14px 18px', textAlign: 'left', fontWeight: 700, whiteSpace: 'nowrap' }}>{COLUMN_LABELS[col] || col}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {result.data.map((row: any, i: number) => (
-                  <tr key={i} style={{
-                    background: i % 2 === 0 ? "white" : "#fafafa",
-                    transition: "background 0.2s ease"
-                  }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = "rgba(0, 138, 14, 0.05)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? "white" : "#fafafa";
-                    }}
-                  >
+                  <tr key={i}>
                     {columns.map((col) => (
-                      <td key={col} style={{
-                        padding: "12px 18px",
-                        borderBottom: "1px solid #f0f0f0",
-                        color: "#444",
-                      }}>
-                        {row[col] ?? "—"}
-                      </td>
+                      <td key={col} style={{ padding: '12px 18px' }}>{row[col] ?? '—'}</td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p style={{ marginTop: 12, fontSize: 13, color: "#999" }}>
-            {result.data.length} registros cargados
-          </p>
+          <p className="page-subtitle" style={{ margin: 0 }}>{result.data.length} registros cargados</p>
         </div>
       )}
 
       {showMapping && preview && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 16,
-              padding: 32,
-              maxWidth: 720,
-              width: "95%",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 style={{ marginTop: 0, fontSize: 20, fontWeight: 700, color: "#1a1a2e", display: "flex", alignItems: "center", gap: 8 }}>
-              🔄 Mapear columnas
-            </h3>
-            <p style={{ color: "#555", fontSize: 14, marginBottom: 20 }}>
-              Indica qué columna de tu Excel corresponde a cada campo del sistema.
-              {preview.suggestedType && (
-                <> Tipo: <strong>{EXCEL_TYPE_LABELS[preview.suggestedType]}</strong></>
-              )}
-            </p>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: 18 }}>
+          <div className="section-card section-card--pad stack-lg" style={{ maxWidth: 760, width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 22 }}>🔄 Mapear columnas</h3>
+              <p className="page-subtitle" style={{ marginBottom: 0 }}>
+                Indica qué columna de tu Excel corresponde a cada campo del sistema.
+                {preview.suggestedType && <> Tipo: <strong>{EXCEL_TYPE_LABELS[preview.suggestedType]}</strong></>}
+              </p>
+            </div>
 
-            <div style={{ marginBottom: 24 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>
-                TPV / Software de gestión
-              </label>
-              <select
-                value={selectedTpv}
-                onChange={(e) => handleTpvChange(e.target.value)}
-                style={{
-                  width: "100%",
-                  maxWidth: 320,
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  border: "1px solid #ddd",
-                  fontSize: 14,
-                  background: "white",
-                }}
-              >
+            <div className="stack">
+              <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>TPV / Software de gestión</label>
+              <select value={selectedTpv} onChange={(e) => handleTpvChange(e.target.value)} className="input-field" style={{ maxWidth: 340, marginTop: 0 }}>
                 <option value="">Sin TPV específico</option>
                 {TPV_PRESETS.filter(p => p.name !== 'custom').map(p => (
                   <option key={p.name} value={p.name}>{p.label}</option>
@@ -700,34 +459,18 @@ export default function SubirExcelPage() {
               </select>
             </div>
 
-            <div style={{ marginBottom: 24 }}>
+            <div className="stack">
               {requiredCols.map((sysCol) => {
                 const mappedCol = Object.entries(mapping).find(([_, v]) => v === sysCol)?.[0] || '';
                 const label = SYSTEM_COLUMN_LABELS[sysCol] || sysCol;
-                const unassigned = preview.columns.filter(c => !Object.values(mapping).includes(c));
-
                 return (
-                  <div key={sysCol} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    marginBottom: 12,
-                    padding: "12px 16px",
-                    background: mappedCol ? "rgba(0, 138, 14, 0.04)" : "#fff8e1",
-                    borderRadius: 12,
-                    border: `1px solid ${mappedCol ? "rgba(0, 138, 14, 0.2)" : "#ffe082"}`,
-                    transition: "all 0.2s ease",
-                  }}>
+                  <div key={sysCol} className="section-card" style={{ padding: 14, background: mappedCol ? 'rgba(31,91,87,0.06)' : 'rgba(230,177,93,0.12)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                     <div style={{ minWidth: 160 }}>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: "#1a1a2e" }}>{label}</div>
-                      <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{sysCol}</div>
+                      <div style={{ fontWeight: 700 }}>{label}</div>
+                      <div className="page-subtitle" style={{ margin: '2px 0 0', fontSize: 11 }}>{sysCol}</div>
                     </div>
-
-                    <div style={{ flexShrink: 0, color: mappedCol ? "#008A0E" : "#ccc", fontSize: 20 }}>
-                      {mappedCol ? '⟶' : '···'}
-                    </div>
-
-                    <div style={{ flex: 1 }}>
+                    <div style={{ color: mappedCol ? 'var(--secondary)' : 'var(--text-muted)', fontSize: 20 }}>{mappedCol ? '⟶' : '···'}</div>
+                    <div style={{ flex: 1, minWidth: 220 }}>
                       <select
                         value={mappedCol}
                         onChange={(e) => {
@@ -737,23 +480,12 @@ export default function SubirExcelPage() {
                           if (e.target.value) newMapping[e.target.value] = sysCol;
                           setMapping(newMapping);
                         }}
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 8,
-                          border: `1px solid ${mappedCol ? "#008A0E" : "#ddd"}`,
-                          fontSize: 14,
-                          background: mappedCol ? "white" : "#fafafa",
-                          fontWeight: mappedCol ? 500 : 400,
-                          color: "#333",
-                          cursor: "pointer",
-                        }}
+                        className="input-field"
+                        style={{ marginTop: 0 }}
                       >
                         <option value="">— Selecciona columna —</option>
                         {preview.columns.map((col) => {
-                          const alreadyUsed = Object.values(mapping).includes(sysCol)
-                            ? false
-                            : Object.values(mapping).includes(col);
+                          const alreadyUsed = Object.values(mapping).includes(sysCol) ? false : Object.values(mapping).includes(col);
                           return (
                             <option key={col} value={col} disabled={alreadyUsed}>
                               {col} {alreadyUsed ? '(ya asignada)' : ''}
@@ -762,90 +494,27 @@ export default function SubirExcelPage() {
                         })}
                       </select>
                     </div>
-
-                    {mappedCol && (
-                      <div style={{
-                        background: "#008A0E",
-                        color: "white",
-                        borderRadius: 20,
-                        width: 24,
-                        height: 24,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}>
-                        ✓
-                      </div>
-                    )}
+                    {mappedCol && <div className="code-pill status-soft">✓</div>}
                   </div>
                 );
               })}
             </div>
 
-            <div style={{
-              padding: 16,
-              background: requiredCols.every(c => Object.values(mapping).includes(c))
-                ? "rgba(0, 138, 14, 0.06)"
-                : "#fff8e1",
-              borderRadius: 12,
-              marginBottom: 24,
-              fontSize: 13,
-              border: `1px solid ${
-                requiredCols.every(c => Object.values(mapping).includes(c))
-                  ? "#008A0E"
-                  : "#ffe082"
-              }`,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 16 }}>
-                  {requiredCols.every(c => Object.values(mapping).includes(c)) ? '✅' : '⚠️'}
-                </span>
-                <span style={{ color: requiredCols.every(c => Object.values(mapping).includes(c)) ? "#008A0E" : "#7a5a00", fontWeight: 500 }}>
-                  {requiredCols.every(c => Object.values(mapping).includes(c))
-                    ? 'Todos los campos obligatorios están mapeados'
-                    : `Faltan campos obligatorios por mapear`}
+            <div className={`section-card section-card--pad ${requiredCols.every(c => Object.values(mapping).includes(c)) ? 'status-soft' : 'status-warn'}`}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 16 }}>{requiredCols.every(c => Object.values(mapping).includes(c)) ? '✅' : '⚠️'}</span>
+                <span style={{ fontWeight: 700 }}>
+                  {requiredCols.every(c => Object.values(mapping).includes(c)) ? 'Todos los campos obligatorios están mapeados' : 'Faltan campos obligatorios por mapear'}
                 </span>
               </div>
-              <div style={{ marginTop: 4, fontSize: 12, color: "#888" }}>
-                Columnas de tu Excel sin usar:{' '}
-                {preview.columns.filter(c => !Object.values(mapping).includes(c)).join(', ') || 'ninguna'}
+              <div className="page-subtitle" style={{ marginBottom: 0, marginTop: 4 }}>
+                Columnas de tu Excel sin usar: {preview.columns.filter(c => !Object.values(mapping).includes(c)).join(', ') || 'ninguna'}
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setShowMapping(false)}
-                style={{
-                  padding: "10px 24px",
-                  background: "white",
-                  color: "#666",
-                  border: "1px solid #ddd",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontWeight: 500,
-                  fontSize: 14,
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => setShowMapping(false)}
-                style={{
-                  padding: "10px 24px",
-                  background: "linear-gradient(135deg, #008A0E 0%, #006607 100%)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontWeight: 600,
-                  fontSize: 14,
-                  boxShadow: "0 4px 12px rgba(0, 138, 14, 0.3)",
-                  opacity: requiredCols.every(c => Object.values(mapping).includes(c)) ? 1 : 0.6,
-                }}
-              >
+            <div className="page-toolbar" style={{ justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowMapping(false)} className="ghost-button">Cancelar</button>
+              <button onClick={() => setShowMapping(false)} className="btn-primary" style={{ opacity: requiredCols.every(c => Object.values(mapping).includes(c)) ? 1 : 0.6 }}>
                 ✓ Confirmar mapping
               </button>
             </div>

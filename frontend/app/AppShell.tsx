@@ -31,14 +31,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isAuthPage = pathname === '/login' || pathname === '/register';
+  const isPublicRoot = pathname === '/';
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [sessionLoading, setSessionLoading] = useState(false);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthPage) return;
 
     const token = getTokenFromCookie();
+    setSessionToken(token);
+
     if (!token) {
+      if (isPublicRoot) {
+        return;
+      }
+
       router.replace('/login');
       return;
     }
@@ -56,6 +64,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         if (res.status === 401 || res.status === 404) {
           document.cookie = 'token=; path=/; max-age=0';
+          setSessionToken(null);
           router.replace('/login');
           return;
         }
@@ -85,11 +94,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     document.cookie = 'token=; path=/; max-age=0';
+    setSessionToken(null);
     setSessionUser(null);
-    router.replace('/login');
+    router.replace('/');
   };
 
   if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  if (isPublicRoot && !sessionToken) {
     return <>{children}</>;
   }
 

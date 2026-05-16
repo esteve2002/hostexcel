@@ -467,6 +467,10 @@ input, select, textarea {
   font-weight: 600;
 }
 
+.promo-lang-toggle {
+  white-space: nowrap;
+}
+
 .promo-topnav a:hover,
 .promo-footer a:hover {
   color: var(--primary-dark);

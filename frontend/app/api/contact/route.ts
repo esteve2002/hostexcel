@@ -11,6 +11,7 @@ type ContactPayload = {
   telefono?: string
   interes?: string
   mensaje?: string
+  language?: 'es' | 'en'
 }
 
 const escapeHtml = (value: string) =>
@@ -39,30 +40,53 @@ export async function POST(request: Request) {
   const telefono = body.telefono?.trim() || '—'
   const interes = body.interes?.trim() || 'demo'
   const mensaje = body.mensaje?.trim() || '—'
+  const language = body.language === 'en' ? 'en' : 'es'
+
+  const labels = language === 'en'
+    ? {
+        title: 'New contact from HostExcel',
+        subjectPrefix: 'New HostExcel contact',
+        name: 'Name',
+        restaurant: 'Restaurant',
+        email: 'Email',
+        phone: 'Phone',
+        interest: 'Interest',
+        message: 'Message',
+      }
+    : {
+        title: 'Nuevo contacto desde HostExcel',
+        subjectPrefix: 'Nuevo contacto HostExcel',
+        name: 'Nombre',
+        restaurant: 'Restaurante',
+        email: 'Email',
+        phone: 'Teléfono',
+        interest: 'Interés',
+        message: 'Mensaje',
+      }
 
   if (!email) {
     return NextResponse.json({ error: 'El email es obligatorio' }, { status: 400 })
   }
 
-  const subject = `Nuevo contacto HostExcel: ${restaurante !== '—' ? restaurante : nombre}`
+  const subject = `${labels.subjectPrefix}: ${restaurante !== '—' ? restaurante : nombre}`
   const text = [
-    `Nombre: ${nombre}`,
-    `Restaurante: ${restaurante}`,
-    `Email: ${email}`,
-    `Teléfono: ${telefono}`,
-    `Interés: ${interes}`,
-    `Mensaje: ${mensaje}`,
+    `${labels.name}: ${nombre}`,
+    `${labels.restaurant}: ${restaurante}`,
+    `${labels.email}: ${email}`,
+    `${labels.phone}: ${telefono}`,
+    `${labels.interest}: ${interes}`,
+    `${labels.message}: ${mensaje}`,
   ].join('\n')
 
   const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #1f2937;">
-      <h2 style="margin: 0 0 12px;">Nuevo contacto desde HostExcel</h2>
-      <p><strong>Nombre:</strong> ${escapeHtml(nombre)}</p>
-      <p><strong>Restaurante:</strong> ${escapeHtml(restaurante)}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-      <p><strong>Teléfono:</strong> ${escapeHtml(telefono)}</p>
-      <p><strong>Interés:</strong> ${escapeHtml(interes)}</p>
-      <p><strong>Mensaje:</strong><br />${escapeHtml(mensaje).replace(/\n/g, '<br />')}</p>
+      <h2 style="margin: 0 0 12px;">${labels.title}</h2>
+      <p><strong>${labels.name}:</strong> ${escapeHtml(nombre)}</p>
+      <p><strong>${labels.restaurant}:</strong> ${escapeHtml(restaurante)}</p>
+      <p><strong>${labels.email}:</strong> ${escapeHtml(email)}</p>
+      <p><strong>${labels.phone}:</strong> ${escapeHtml(telefono)}</p>
+      <p><strong>${labels.interest}:</strong> ${escapeHtml(interes)}</p>
+      <p><strong>${labels.message}:</strong><br />${escapeHtml(mensaje).replace(/\n/g, '<br />')}</p>
     </div>
   `
 

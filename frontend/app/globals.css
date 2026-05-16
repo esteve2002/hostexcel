@@ -360,6 +360,39 @@ input, select, textarea {
   gap: 24px;
 }
 
+.promo-topbar {
+  padding: 16px 20px;
+  border-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.promo-topbar-copy {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.promo-topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.promo-topnav a,
+.promo-footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.promo-topnav a:hover,
+.promo-footer a:hover {
+  color: var(--primary-dark);
+}
+
 .promo-hero {
   padding: 28px;
   border-radius: 30px;
@@ -542,6 +575,197 @@ input, select, textarea {
 .promo-cta p {
   margin: 0;
   color: var(--text-secondary);
+}
+
+.promo-about,
+.promo-process,
+.promo-contact {
+  padding: 26px 28px;
+  border-radius: 28px;
+}
+
+.promo-about {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.promo-about h2,
+.promo-process h2,
+.promo-contact h2 {
+  margin: 10px 0 12px;
+  font-size: 28px;
+  line-height: 1.05;
+}
+
+.promo-about p,
+.promo-process p,
+.promo-contact p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.promo-about ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.promo-about li {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(194, 76, 42, 0.06);
+  border: 1px solid rgba(194, 76, 42, 0.10);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.promo-section-label {
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(31, 91, 87, 0.08);
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.promo-process-header {
+  max-width: 720px;
+  margin-bottom: 18px;
+}
+
+.promo-process-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.promo-process-step {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid var(--border-light);
+}
+
+.promo-process-step span {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(194, 76, 42, 0.12);
+  color: var(--primary-dark);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.promo-process-step h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.promo-process-step p {
+  font-size: 14px;
+}
+
+.promo-contact {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.promo-contact-copy a {
+  color: var(--primary-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.promo-success {
+  margin-top: 14px !important;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(31, 91, 87, 0.10);
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+.promo-form {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border-light);
+}
+
+.promo-form label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.promo-form input,
+.promo-form select,
+.promo-form textarea {
+  width: 100%;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-light);
+  padding: 12px 14px;
+  background: rgba(255, 252, 246, 0.96);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.promo-form textarea {
+  resize: vertical;
+  min-height: 132px;
+}
+
+.promo-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.promo-form-submit {
+  justify-content: center;
+}
+
+.promo-footer {
+  padding: 18px 22px;
+  border-radius: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.promo-footer strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.promo-footer p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.promo-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
 .sidebar-session {
@@ -1371,6 +1595,20 @@ input, select, textarea {
 
   .promo-cta {
     justify-content: stretch;
+  }
+
+  .promo-topbar,
+  .promo-about,
+  .promo-contact,
+  .promo-footer {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .promo-process-grid,
+  .promo-form-row {
+    grid-template-columns: 1fr;
   }
 }
 

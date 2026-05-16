@@ -15,6 +15,8 @@ export default function HomePage() {
     mensaje: "",
   });
   const [showPopup, setShowPopup] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const highlights = [
     { value: "3x", label: "menos trabajo manual" },
@@ -60,7 +62,30 @@ export default function HomePage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setShowPopup(true);
+    setSending(true);
+    setSubmitError(null);
+
+    void (async () => {
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => null);
+          throw new Error(data?.error || 'No se pudo enviar el mensaje');
+        }
+
+        setShowPopup(true);
+        setForm({ nombre: '', restaurante: '', email: '', telefono: '', interes: 'demo', mensaje: '' });
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : 'No se pudo enviar el mensaje');
+      } finally {
+        setSending(false);
+      }
+    })();
   };
 
   return (
@@ -187,7 +212,8 @@ export default function HomePage() {
             Completa el formulario y te abrimos una conversación. También puedes escribirnos directamente a
             <a href={`mailto:${CONTACT_EMAIL}`}> {CONTACT_EMAIL}</a>.
           </p>
-          <p className="promo-success">Gracias por ponerte en contacto con nosotros.</p>
+          <p className="promo-success">Te responderemos lo antes posible.</p>
+          {submitError && <p className="promo-error">{submitError}</p>}
         </div>
 
         <form className="promo-form" onSubmit={handleSubmit}>
@@ -257,8 +283,8 @@ export default function HomePage() {
             />
           </label>
 
-          <button className="btn-primary promo-form-submit" type="submit">
-            Enviar solicitud
+          <button className="btn-primary promo-form-submit" type="submit" disabled={sending}>
+            {sending ? 'Enviando...' : 'Enviar solicitud'}
           </button>
         </form>
       </section>

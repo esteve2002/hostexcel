@@ -882,6 +882,15 @@ input, select, textarea {
   font-weight: 700;
 }
 
+.promo-error {
+  margin-top: 14px !important;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(217, 74, 74, 0.10);
+  color: #b83a3a;
+  font-weight: 700;
+}
+
 .promo-popup-backdrop {
   position: fixed;
   inset: 0;

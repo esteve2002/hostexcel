@@ -5,7 +5,27 @@ import Image from "next/image";
 import { previewExcel, type PreviewResult } from "@/lib/excel";
 
 const CONTACT_EMAIL = "hola@hostexcel.com";
-const TRIAL_STORAGE_KEY = "hostexcel_trial_excel_used";
+const TRIAL_LIMIT = 2;
+
+function getTrialStorageKey() {
+  if (typeof window === "undefined") return "hostexcel_trial_excel_count:guest";
+
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("token="))
+    ?.split("=")[1];
+
+  if (!token) return "hostexcel_trial_excel_count:guest";
+
+  try {
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+    const payload = JSON.parse(atob(padded));
+    return `hostexcel_trial_excel_count:${payload.sub || "guest"}`;
+  } catch {
+    return "hostexcel_trial_excel_count:guest";
+  }
+}
 
 export default function HomePage() {
   const [form, setForm] = useState({
@@ -17,7 +37,7 @@ export default function HomePage() {
     mensaje: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [trialUsed, setTrialUsed] = useState(false);
+  const [trialCount, setTrialCount] = useState(0);
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialError, setTrialError] = useState<string | null>(null);
   const [trialPreview, setTrialPreview] = useState<PreviewResult | null>(null);
@@ -65,7 +85,8 @@ export default function HomePage() {
   ];
 
   useEffect(() => {
-    setTrialUsed(window.localStorage.getItem(TRIAL_STORAGE_KEY) === "1");
+    const key = getTrialStorageKey();
+    setTrialCount(Number(window.localStorage.getItem(key) || 0));
   }, []);
 
   const mailtoHref = useMemo(() => {
@@ -93,8 +114,12 @@ export default function HomePage() {
   const handleTrialExcel = async (file: File | null) => {
     if (!file) return;
 
-    if (trialUsed) {
-      setTrialError("Ya has usado tu Excel de prueba. Para seguir usando la app, contacta con nosotros.");
+    const key = getTrialStorageKey();
+    const currentCount = Number(window.localStorage.getItem(key) || 0);
+
+    if (currentCount >= TRIAL_LIMIT) {
+      setTrialError("Ya has usado tus 2 Excel de prueba. Para seguir usando la app, contacta con nosotros.");
+      setTrialCount(currentCount);
       return;
     }
 
@@ -105,8 +130,9 @@ export default function HomePage() {
       const buffer = await file.arrayBuffer();
       const result = previewExcel(buffer);
       setTrialPreview(result);
-      window.localStorage.setItem(TRIAL_STORAGE_KEY, "1");
-      setTrialUsed(true);
+      const nextCount = currentCount + 1;
+      window.localStorage.setItem(key, String(nextCount));
+      setTrialCount(nextCount);
     } catch (error) {
       setTrialError(error instanceof Error ? error.message : "No se pudo leer el Excel de prueba");
     } finally {
@@ -180,10 +206,10 @@ export default function HomePage() {
       <section className="promo-trial card">
         <div className="promo-trial-copy">
           <span className="promo-section-label">Excel de prueba</span>
-          <h2>Prueba la app con 1 Excel gratis.</h2>
+          <h2>Prueba la app con 2 Excel gratis.</h2>
           <p>
-            Puedes subir un archivo de prueba para ver cómo detecta columnas y tipo de Excel. Después del primer uso,
-            tendrás que ponerte en contacto con el cliente para seguir usando la app.
+            Puedes subir hasta 2 archivos de prueba para ver cómo detecta columnas y tipo de Excel. Después, tendrás que
+            ponerte en contacto con el cliente para seguir usando la app.
           </p>
           <div className="promo-trial-actions">
             <label className="promo-trial-upload">
@@ -191,12 +217,13 @@ export default function HomePage() {
                 type="file"
                 accept=".xlsx,.xls"
                 onChange={(e) => handleTrialExcel(e.target.files?.[0] ?? null)}
-                disabled={trialUsed || trialLoading}
+                disabled={trialCount >= TRIAL_LIMIT || trialLoading}
               />
-              {trialLoading ? "Analizando Excel..." : trialUsed ? "Excel de prueba usado" : "Subir Excel de prueba"}
+              {trialLoading ? "Analizando Excel..." : trialCount >= TRIAL_LIMIT ? "Límite de prueba alcanzado" : "Subir Excel de prueba"}
             </label>
             <a className="btn-secondary" href={`mailto:${CONTACT_EMAIL}`}>Contactar para seguir</a>
           </div>
+          <p className="promo-trial-note">Usos de prueba: {trialCount}/{TRIAL_LIMIT}</p>
           {trialError && <p className="promo-trial-warning">{trialError}</p>}
         </div>
 

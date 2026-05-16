@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { previewExcel, type PreviewResult } from "@/lib/excel";
 
-const CONTACT_EMAIL = "hola@hostexcel.com";
+const CONTACT_EMAIL = "info@hostexcel.es";
 const TRIAL_LIMIT = 2;
 
 function getTrialStorageKey() {
@@ -301,7 +301,7 @@ export default function HomePage() {
         </div>
         <div className="promo-actions">
           <a className="btn-primary" href="#contacto">Quiero que me contacten</a>
-          <a className="btn-secondary" href="mailto:hola@hostexcel.com">Escribir por correo</a>
+          <a className="btn-secondary" href={`mailto:${CONTACT_EMAIL}`}>Escribir por correo</a>
         </div>
       </section>
 

@@ -882,6 +882,36 @@ input, select, textarea {
   font-weight: 700;
 }
 
+.promo-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 20, 30, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+.promo-popup {
+  width: min(92vw, 420px);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  text-align: left;
+}
+
+.promo-popup strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.promo-popup p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
 .promo-form {
   display: grid;
   gap: 14px;

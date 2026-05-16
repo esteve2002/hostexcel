@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Image from "next/image";
 
 const CONTACT_EMAIL = "info@hostexcel.es";
@@ -14,7 +14,7 @@ export default function HomePage() {
     interes: "demo",
     mensaje: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const highlights = [
     { value: "3x", label: "menos trabajo manual" },
@@ -58,26 +58,9 @@ export default function HomePage() {
     },
   ];
 
-  const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent(`Interesado en HostExcel - ${form.restaurante || form.nombre || "Nuevo contacto"}`);
-    const body = encodeURIComponent(
-      [
-        `Nombre: ${form.nombre || ""}`,
-        `Restaurante: ${form.restaurante || ""}`,
-        `Email: ${form.email || ""}`,
-        `Teléfono: ${form.telefono || ""}`,
-        `Interés: ${form.interes}`,
-        `Mensaje: ${form.mensaje || ""}`,
-      ].join("\n")
-    );
-
-    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-  }, [form]);
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-    window.location.href = mailtoHref;
+    setShowPopup(true);
   };
 
   return (
@@ -204,7 +187,7 @@ export default function HomePage() {
             Completa el formulario y te abrimos una conversación. También puedes escribirnos directamente a
             <a href={`mailto:${CONTACT_EMAIL}`}> {CONTACT_EMAIL}</a>.
           </p>
-          {submitted && <p className="promo-success">Gracias. Se ha abierto tu correo para enviarnos tu solicitud.</p>}
+          <p className="promo-success">Gracias por ponerte en contacto con nosotros.</p>
         </div>
 
         <form className="promo-form" onSubmit={handleSubmit}>
@@ -279,6 +262,22 @@ export default function HomePage() {
           </button>
         </form>
       </section>
+
+      {showPopup && (
+        <div className="promo-popup-backdrop" role="presentation" onClick={(event) => {
+          if (event.target === event.currentTarget) setShowPopup(false);
+        }}>
+          <div className="promo-popup card" role="dialog" aria-modal="true" aria-label="Confirmación de contacto">
+            <div>
+              <strong>Mensaje enviado</strong>
+              <p>Gracias por ponerte en contacto con nosotros, recibirás respuesta lo antes posible.</p>
+            </div>
+            <button type="button" className="btn-secondary" onClick={() => setShowPopup(false)}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
       <footer className="promo-footer card">
         <div>

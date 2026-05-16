@@ -1,31 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import Image from "next/image";
-import { previewExcel, type PreviewResult } from "@/lib/excel";
 
 const CONTACT_EMAIL = "info@hostexcel.es";
-const TRIAL_LIMIT = 2;
-
-function getTrialStorageKey() {
-  if (typeof window === "undefined") return "hostexcel_trial_excel_count:guest";
-
-  const token = document.cookie
-    .split("; ")
-    .find((cookie) => cookie.startsWith("token="))
-    ?.split("=")[1];
-
-  if (!token) return "hostexcel_trial_excel_count:guest";
-
-  try {
-    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-    const payload = JSON.parse(atob(padded));
-    return `hostexcel_trial_excel_count:${payload.sub || "guest"}`;
-  } catch {
-    return "hostexcel_trial_excel_count:guest";
-  }
-}
 
 export default function HomePage() {
   const [form, setForm] = useState({
@@ -37,10 +15,6 @@ export default function HomePage() {
     mensaje: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [trialCount, setTrialCount] = useState(0);
-  const [trialLoading, setTrialLoading] = useState(false);
-  const [trialError, setTrialError] = useState<string | null>(null);
-  const [trialPreview, setTrialPreview] = useState<PreviewResult | null>(null);
 
   const highlights = [
     { value: "3x", label: "menos trabajo manual" },
@@ -84,11 +58,6 @@ export default function HomePage() {
     },
   ];
 
-  useEffect(() => {
-    const key = getTrialStorageKey();
-    setTrialCount(Number(window.localStorage.getItem(key) || 0));
-  }, []);
-
   const mailtoHref = useMemo(() => {
     const subject = encodeURIComponent(`Interesado en HostExcel - ${form.restaurante || form.nombre || "Nuevo contacto"}`);
     const body = encodeURIComponent(
@@ -109,35 +78,6 @@ export default function HomePage() {
     event.preventDefault();
     setSubmitted(true);
     window.location.href = mailtoHref;
-  };
-
-  const handleTrialExcel = async (file: File | null) => {
-    if (!file) return;
-
-    const key = getTrialStorageKey();
-    const currentCount = Number(window.localStorage.getItem(key) || 0);
-
-    if (currentCount >= TRIAL_LIMIT) {
-      setTrialError("Ya has usado tus 2 Excel de prueba. Para seguir usando la app, contacta con nosotros.");
-      setTrialCount(currentCount);
-      return;
-    }
-
-    setTrialLoading(true);
-    setTrialError(null);
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const result = previewExcel(buffer);
-      setTrialPreview(result);
-      const nextCount = currentCount + 1;
-      window.localStorage.setItem(key, String(nextCount));
-      setTrialCount(nextCount);
-    } catch (error) {
-      setTrialError(error instanceof Error ? error.message : "No se pudo leer el Excel de prueba");
-    } finally {
-      setTrialLoading(false);
-    }
   };
 
   return (
@@ -200,55 +140,6 @@ export default function HomePage() {
               <p>Visualiza y actúa</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="promo-trial card">
-        <div className="promo-trial-copy">
-          <span className="promo-section-label">Excel de prueba</span>
-          <h2>Prueba la app con 2 Excel gratis.</h2>
-          <p>
-            Puedes subir hasta 2 archivos de prueba para ver cómo detecta columnas y tipo de Excel. Después, tendrás que
-            ponerte en contacto con el cliente para seguir usando la app.
-          </p>
-          <div className="promo-trial-actions">
-            <label className="promo-trial-upload">
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={(e) => handleTrialExcel(e.target.files?.[0] ?? null)}
-                disabled={trialCount >= TRIAL_LIMIT || trialLoading}
-              />
-              {trialLoading ? "Analizando Excel..." : trialCount >= TRIAL_LIMIT ? "Límite de prueba alcanzado" : "Subir Excel de prueba"}
-            </label>
-            <a className="btn-secondary" href={`mailto:${CONTACT_EMAIL}`}>Contactar para seguir</a>
-          </div>
-          <p className="promo-trial-note">Usos de prueba: {trialCount}/{TRIAL_LIMIT}</p>
-          {trialError && <p className="promo-trial-warning">{trialError}</p>}
-        </div>
-
-        <div className="promo-trial-result">
-          {!trialPreview ? (
-            <div className="promo-trial-empty">
-              <strong>Vista previa</strong>
-              <p>Aquí verás el tipo detectado y las columnas al subir el archivo.</p>
-            </div>
-          ) : (
-            <>
-              <div className="promo-trial-summary">
-                <strong>{trialPreview.suggestedType ? trialPreview.suggestedType.toUpperCase() : "TIPO NO DETECTADO"}</strong>
-                <span>{trialPreview.columns.length} columnas detectadas</span>
-              </div>
-              <div className="promo-trial-columns">
-                {trialPreview.columns.slice(0, 6).map((column) => (
-                  <span key={column}>{column}</span>
-                ))}
-              </div>
-              {trialPreview.missingColumns.length > 0 && (
-                <p className="promo-trial-note">Faltan: {trialPreview.missingColumns.join(", ")}</p>
-              )}
-            </>
-          )}
         </div>
       </section>
 

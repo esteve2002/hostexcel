@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { supabase } from '@/lib/supabase'
 import { getUserIdFromRequest } from '@/lib/auth'
 import { processExcel } from '@/lib/excel'
+
+const TRIAL_LIMIT = 2
 
 export async function POST(request: NextRequest) {
   const userId = getUserIdFromRequest(request)
@@ -9,6 +12,23 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const { data: uploads, error: uploadsError } = await supabase
+      .from('excel_uploads')
+      .select('id, success')
+      .eq('restaurante_id', userId)
+
+    if (uploadsError) {
+      throw uploadsError
+    }
+
+    const successfulUploads = (Array.isArray(uploads) ? uploads : []).filter((upload) => Boolean(upload.success)).length
+    if (successfulUploads >= TRIAL_LIMIT) {
+      return NextResponse.json(
+        { error: `Has alcanzado el límite de ${TRIAL_LIMIT} subidas de prueba. Contacta con nosotros para seguir usando la app.` },
+        { status: 403 }
+      )
+    }
+
     const formData = await request.formData()
     const file = formData.get('file') as File
     const force = formData.get('force') === 'true'

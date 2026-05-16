@@ -19,6 +19,12 @@ import {
   type TpvPreset,
 } from "@/lib/columnMapper";
 
+const TRIAL_LIMIT = 2;
+
+type UploadRecord = {
+  success: boolean;
+};
+
 export default function SubirExcelPage() {
   const [mounted, setMounted] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -39,6 +45,8 @@ export default function SubirExcelPage() {
   const [selectedTpv, setSelectedTpv] = useState<string>('');
 
   const [userId, setUserId] = useState<string | null>(null);
+  const [uploadCount, setUploadCount] = useState(0);
+  const [usageLoading, setUsageLoading] = useState(true);
 
   useEffect(() => setMounted(true), []);
 
@@ -58,7 +66,28 @@ export default function SubirExcelPage() {
     }
   }, []);
 
+  useEffect(() => {
+    const loadUsage = async () => {
+      setUsageLoading(true);
+      try {
+        const res = await fetch('/api/historial/uploads', {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+
+        if (res.ok) {
+          const data = (await res.json()) as UploadRecord[];
+          setUploadCount(data.filter((item) => item.success).length);
+        }
+      } finally {
+        setUsageLoading(false);
+      }
+    };
+
+    loadUsage();
+  }, []);
+
   const hasContent = !!(file || result || error || duplicado);
+  const trialLimitReached = uploadCount >= TRIAL_LIMIT;
 
   const COLUMN_LABELS: Record<string, string> = {
     proveedor: "Proveedor",
@@ -201,6 +230,10 @@ export default function SubirExcelPage() {
 
   const handleStartUpload = async () => {
     if (!file) return;
+    if (trialLimitReached) {
+      setError(`Has alcanzado el límite de ${TRIAL_LIMIT} subidas de prueba. Contacta con nosotros para seguir usando la app.`);
+      return;
+    }
     setLoading(true);
     setError(null);
     setResult(null);
@@ -245,6 +278,10 @@ export default function SubirExcelPage() {
 
   const handleForce = async () => {
     if (!file) return;
+    if (trialLimitReached) {
+      setError(`Has alcanzado el límite de ${TRIAL_LIMIT} subidas de prueba. Contacta con nosotros para seguir usando la app.`);
+      return;
+    }
     setLoading(true);
     setDuplicado(null);
 
@@ -300,14 +337,34 @@ export default function SubirExcelPage() {
         </div>
       </div>
 
+      <div className="section-card section-card--pad status-soft stack-sm">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-primary)' }}>Prueba la app con 2 Excels</p>
+            <p className="page-subtitle" style={{ margin: '4px 0 0', fontSize: 13 }}>
+              {usageLoading ? 'Comprobando tu uso...' : `Usos de prueba: ${uploadCount}/${TRIAL_LIMIT}`}
+            </p>
+          </div>
+          <a className="btn-secondary" href="mailto:info@hostexcel.es">Contactar para seguir</a>
+        </div>
+        <p className="page-subtitle" style={{ margin: 0, fontSize: 13 }}>
+          Puedes subir hasta 2 Excels de prueba desde aquí. Cuando llegues al límite, tendrás que ponerte en contacto con nosotros.
+        </p>
+      </div>
+
       <div className="section-card section-card--pad stack-lg">
         <label
           htmlFor="fileInput"
           className="upload-dropzone"
-          style={{ borderColor: file ? 'var(--secondary)' : undefined, background: file ? 'rgba(31,91,87,0.08)' : undefined }}
+          style={{
+            borderColor: trialLimitReached ? 'var(--primary)' : file ? 'var(--secondary)' : undefined,
+            background: trialLimitReached ? 'rgba(34,91,140,0.08)' : file ? 'rgba(31,91,87,0.08)' : undefined,
+          }}
         >
           <div style={{ fontSize: 64, marginBottom: 16 }}>{file ? '✅' : '📂'}</div>
-          <p style={{ fontSize: 18, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 8 }}>{file ? 'Archivo seleccionado' : 'Arrastra un archivo o haz clic aquí'}</p>
+          <p style={{ fontSize: 18, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 8 }}>
+            {trialLimitReached ? 'Límite de prueba alcanzado' : file ? 'Archivo seleccionado' : 'Arrastra un archivo o haz clic aquí'}
+          </p>
           <p className="page-subtitle" style={{ margin: 0 }}>Formatos soportados: .xlsx, .xls</p>
         </label>
         <input
@@ -315,7 +372,14 @@ export default function SubirExcelPage() {
           type="file"
           accept=".xlsx,.xls"
           style={{ display: 'none' }}
-          onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+          onChange={(e) => {
+            if (trialLimitReached) {
+              setError(`Has alcanzado el límite de ${TRIAL_LIMIT} subidas de prueba. Contacta con nosotros para seguir usando la app.`);
+              return;
+            }
+            handleFileSelect(e.target.files?.[0] || null);
+          }}
+          disabled={trialLimitReached}
         />
 
         {file && (
@@ -360,11 +424,11 @@ export default function SubirExcelPage() {
       </div>
 
       <div className="page-toolbar">
-        <button onClick={handleStartUpload} disabled={loading || !file || (showMapping && !allRequiredMapped)} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
+        <button onClick={handleStartUpload} disabled={loading || !file || (showMapping && !allRequiredMapped) || trialLimitReached} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
           {loading ? (
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><span style={{ display: 'inline-block', width: 20, height: 20, border: '3px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />Subiendo...</span>
           ) : (
-            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>🚀 SUBIR EXCEL</span>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>{trialLimitReached ? '🔒 LÍMITE ALCANZADO' : '🚀 SUBIR EXCEL'}</span>
           )}
         </button>
 
@@ -379,7 +443,7 @@ export default function SubirExcelPage() {
               <p style={{ margin: '0 0 12px', fontWeight: 700, fontSize: 15 }}>Datos existentes detectados</p>
               <p style={{ margin: '0 0 16px', fontSize: 14 }}>{duplicado}</p>
               <div className="page-toolbar">
-                <button onClick={handleForce} className="btn-primary">🔄 Sobreescribir</button>
+                <button onClick={handleForce} className="btn-primary" disabled={trialLimitReached}>🔄 Sobreescribir</button>
                 <button onClick={() => setDuplicado(null)} className="ghost-button">Cancelar</button>
               </div>
             </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
 
 export default function RegisterPage() {
@@ -48,22 +49,17 @@ export default function RegisterPage() {
     <div className="auth-shell">
       <div className="animate-fade-in-up" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div
-          className="brand-mark"
+          className="app-logo-shell app-logo-shell--hero"
           style={{
-            width: 68, height: 68,
-            borderRadius: 18,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "white", fontWeight: 800, fontSize: 32,
-            fontFamily: "var(--font-display)",
             marginBottom: 20,
           }}
         >
-          H
+          <Image src="/images/hostexcel_logo.png" alt="HostExcel" width={96} height={96} className="app-logo" priority />
         </div>
-        <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "#FFF8EC" }}>
+        <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "var(--text-primary)" }}>
           Crear cuenta
         </h1>
-        <p style={{ color: "rgba(255,248,236,0.72)", fontSize: 15, marginTop: 8, marginBottom: 32 }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 8, marginBottom: 32 }}>
           Convierte hojas dispersas en decisiones de sala
         </p>
 

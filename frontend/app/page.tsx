@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
+import Image from "next/image";
 
 const CONTACT_EMAIL = "hola@hostexcel.com";
 
@@ -83,8 +84,13 @@ export default function HomePage() {
     <main className="promo-shell">
       <header className="promo-topbar card">
         <div>
-          <span className="promo-badge">HostExcel para restaurantes</span>
-          <p className="promo-topbar-copy">Control de datos, márgenes y stock sin fricción.</p>
+          <div className="promo-brandline">
+            <Image src="/images/hostexcel_logo.png" alt="HostExcel" width={52} height={52} className="promo-logo" priority />
+            <div>
+              <span className="promo-badge">HostExcel para restaurantes</span>
+              <p className="promo-topbar-copy">Control de datos, márgenes y stock sin fricción.</p>
+            </div>
+          </div>
         </div>
         <nav className="promo-topnav">
           <a href="#quienes-somos">Quiénes somos</a>

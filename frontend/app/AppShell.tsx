@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type SessionUser = {
   email: string;
@@ -127,23 +128,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           padding: "4px 12px 0",
           marginBottom: "36px",
         }}>
-          <div
-            className="brand-mark"
-            style={{
-              width: "38px",
-              height: "38px",
-              borderRadius: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontWeight: 800,
-              fontSize: "18px",
-              fontFamily: "var(--font-display)",
-              flexShrink: 0,
-            }}
-          >
-            H
+          <div className="app-logo-shell">
+            <Image
+              src="/images/hostexcel_logo.png"
+              alt="HostExcel"
+              width={64}
+              height={64}
+              className="app-logo"
+              priority
+            />
           </div>
           <div>
             <div style={{

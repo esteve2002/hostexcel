@@ -3,34 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --primary: #C24C2A;
-  --primary-dark: #9A381D;
-  --primary-light: #E06B43;
-  --primary-glow: rgba(194, 76, 42, 0.18);
-  --secondary: #1F5B57;
-  --secondary-light: #2F7872;
-  --secondary-glow: rgba(31, 91, 87, 0.16);
-  --accent: #C58B28;
-  --accent-glow: rgba(197, 139, 40, 0.22);
-  --ink: #241814;
-  --sidebar-bg: #211712;
-  --sidebar-hover: rgba(255, 244, 223, 0.08);
-  --sidebar-active: rgba(230, 177, 93, 0.14);
-  --bg-warm: #FBF8F1;
-  --bg-card: rgba(255, 255, 255, 0.94);
-  --text-primary: #1F1A17;
-  --text-secondary: #5E5248;
-  --text-muted: #88786C;
-  --border-light: rgba(56, 41, 31, 0.12);
-  --border-medium: rgba(56, 41, 31, 0.22);
+  --primary: #225B8C;
+  --primary-dark: #173A63;
+  --primary-light: #3A7CBC;
+  --primary-glow: rgba(34, 91, 140, 0.18);
+  --secondary: #2C9A66;
+  --secondary-light: #49B87E;
+  --secondary-glow: rgba(44, 154, 102, 0.16);
+  --accent: #66C487;
+  --accent-glow: rgba(102, 196, 135, 0.22);
+  --ink: #0E223A;
+  --sidebar-bg: #0B2740;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active: rgba(102, 196, 135, 0.16);
+  --bg-warm: #F5F9FC;
+  --bg-card: rgba(255, 255, 255, 0.96);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --border-light: rgba(15, 23, 42, 0.10);
+  --border-medium: rgba(15, 23, 42, 0.18);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-sm: 0 1px 2px rgba(36,24,20,0.05);
-  --shadow-md: 0 10px 30px rgba(36,24,20,0.08);
-  --shadow-lg: 0 20px 60px rgba(36,24,20,0.12);
-  --shadow-xl: 0 28px 90px rgba(36,24,20,0.16);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+  --shadow-md: 0 12px 32px rgba(15,23,42,0.10);
+  --shadow-lg: 0 20px 60px rgba(15,23,42,0.14);
+  --shadow-xl: 0 28px 90px rgba(15,23,42,0.18);
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-body: var(--font-ibm-plex-sans), -apple-system, BlinkMacSystemFont, sans-serif;
   --transition: 0.22s cubic-bezier(.2,.8,.2,1);
@@ -38,10 +38,10 @@
 
 body {
   background:
-    radial-gradient(circle at 10% 10%, rgba(197, 139, 40, 0.16), transparent 24rem),
-    radial-gradient(circle at 90% 14%, rgba(31, 91, 87, 0.10), transparent 26rem),
-    radial-gradient(circle at 52% 100%, rgba(194, 76, 42, 0.06), transparent 22rem),
-    linear-gradient(120deg, rgba(56, 41, 31, 0.03) 0 1px, transparent 1px 24px),
+    radial-gradient(circle at 10% 10%, rgba(34, 91, 140, 0.14), transparent 24rem),
+    radial-gradient(circle at 90% 14%, rgba(44, 154, 102, 0.11), transparent 26rem),
+    radial-gradient(circle at 52% 100%, rgba(102, 196, 135, 0.08), transparent 22rem),
+    linear-gradient(120deg, rgba(15, 23, 42, 0.03) 0 1px, transparent 1px 24px),
     var(--bg-warm);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -243,8 +243,8 @@ input, select, textarea {
 
 .app-sidebar {
   background:
-    radial-gradient(circle at 0% 0%, rgba(230, 177, 93, 0.18), transparent 16rem),
-    linear-gradient(180deg, #2A1C15 0%, var(--sidebar-bg) 60%);
+    radial-gradient(circle at 0% 0%, rgba(102, 196, 135, 0.16), transparent 16rem),
+    linear-gradient(180deg, #103452 0%, var(--sidebar-bg) 60%);
   width: 264px;
   min-height: 100vh;
   padding: 24px 12px;
@@ -265,8 +265,34 @@ input, select, textarea {
 
 .brand-mark {
   background:
-    linear-gradient(135deg, #F3C06D 0%, #BC4B2F 58%, #254E4B 100%);
-  box-shadow: 0 10px 26px rgba(188, 75, 47, 0.32);
+    linear-gradient(135deg, #3A7CBC 0%, #2C9A66 100%);
+  box-shadow: 0 10px 26px rgba(34, 91, 140, 0.22);
+}
+
+.app-logo-shell {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+  flex-shrink: 0;
+}
+
+.app-logo-shell--hero {
+  width: 92px;
+  height: 92px;
+  padding: 10px;
+  border-radius: 24px;
+}
+
+.app-logo,
+.promo-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .nav-link {
@@ -285,7 +311,7 @@ input, select, textarea {
 
 .nav-link:hover {
   background: var(--sidebar-hover);
-  color: rgba(255,255,255,0.86);
+  color: rgba(255,255,255,0.92);
 }
 
 .nav-link.active {
@@ -314,8 +340,8 @@ input, select, textarea {
   position: relative;
   overflow: hidden;
   background:
-    linear-gradient(115deg, rgba(36, 24, 20, 0.92), rgba(54, 35, 24, 0.82)),
-    radial-gradient(circle at 20% 25%, rgba(230, 177, 93, 0.34), transparent 22rem),
+    linear-gradient(115deg, rgba(11, 39, 64, 0.94), rgba(15, 23, 42, 0.84)),
+    radial-gradient(circle at 20% 25%, rgba(102, 196, 135, 0.26), transparent 22rem),
     var(--bg-warm);
 }
 
@@ -333,7 +359,7 @@ input, select, textarea {
   height: 520px;
   right: -120px;
   top: -140px;
-  background: radial-gradient(circle, rgba(230, 177, 93, 0.34), transparent 68%);
+  background: radial-gradient(circle, rgba(58, 124, 188, 0.30), transparent 68%);
 }
 
 .auth-shell::after {
@@ -341,14 +367,14 @@ input, select, textarea {
   height: 420px;
   left: -100px;
   bottom: -120px;
-  background: radial-gradient(circle, rgba(188, 75, 47, 0.24), transparent 70%);
+  background: radial-gradient(circle, rgba(44, 154, 102, 0.24), transparent 70%);
   animation-delay: -3s;
 }
 
 .auth-card {
-  background: rgba(255, 252, 246, 0.93);
-  border: 1px solid rgba(255, 244, 223, 0.55);
-  box-shadow: 0 30px 90px rgba(20, 11, 7, 0.28);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.26);
   backdrop-filter: blur(22px);
 }
 
@@ -378,6 +404,12 @@ input, select, textarea {
 .promo-topnav {
   display: flex;
   flex-wrap: wrap;
+  gap: 14px;
+}
+
+.promo-brandline {
+  display: flex;
+  align-items: center;
   gap: 14px;
 }
 
@@ -414,7 +446,7 @@ input, select, textarea {
   width: fit-content;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(194, 76, 42, 0.10);
+  background: rgba(34, 91, 140, 0.10);
   color: var(--primary-dark);
   font-size: 12px;
   font-weight: 700;
@@ -447,7 +479,7 @@ input, select, textarea {
 .promo-hero-panel {
   padding: 20px;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(31, 91, 87, 0.08), rgba(255,255,255,0.88));
+  background: linear-gradient(180deg, rgba(34, 91, 140, 0.08), rgba(255,255,255,0.92));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -470,7 +502,7 @@ input, select, textarea {
 .promo-panel-chip {
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(31, 91, 87, 0.12);
+  background: rgba(44, 154, 102, 0.12);
   color: var(--secondary);
   font-size: 12px;
   font-weight: 700;
@@ -523,7 +555,7 @@ input, select, textarea {
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: rgba(194, 76, 42, 0.12);
+  background: rgba(34, 91, 140, 0.12);
   color: var(--primary-dark);
   font-size: 12px;
   font-weight: 800;
@@ -618,8 +650,8 @@ input, select, textarea {
 .promo-about li {
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(194, 76, 42, 0.06);
-  border: 1px solid rgba(194, 76, 42, 0.10);
+  background: rgba(34, 91, 140, 0.06);
+  border: 1px solid rgba(34, 91, 140, 0.10);
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -629,7 +661,7 @@ input, select, textarea {
   width: fit-content;
   padding: 7px 10px;
   border-radius: 999px;
-  background: rgba(31, 91, 87, 0.08);
+  background: rgba(44, 154, 102, 0.10);
   color: var(--secondary);
   font-size: 12px;
   font-weight: 700;
@@ -661,7 +693,7 @@ input, select, textarea {
   width: 32px;
   height: 32px;
   border-radius: 999px;
-  background: rgba(194, 76, 42, 0.12);
+  background: rgba(34, 91, 140, 0.12);
   color: var(--primary-dark);
   font-weight: 800;
   margin-bottom: 12px;
@@ -693,7 +725,7 @@ input, select, textarea {
   margin-top: 14px !important;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(31, 91, 87, 0.10);
+  background: rgba(44, 154, 102, 0.10);
   color: var(--secondary);
   font-weight: 700;
 }

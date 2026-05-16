@@ -48,7 +48,9 @@ export default function RegisterPage() {
   return (
     <div className="auth-shell">
       <div className="animate-fade-in-up" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={240} height={132} className="brand-logo-wordmark brand-logo-wordmark--hero" priority />
+        <div className="logo-frame logo-frame--hero">
+          <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={240} height={132} className="brand-logo-wordmark brand-logo-wordmark--hero" priority />
+        </div>
         <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "var(--text-primary)" }}>Crear cuenta</h1>
         <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 8, marginBottom: 32 }}>
           Convierte hojas dispersas en decisiones de sala

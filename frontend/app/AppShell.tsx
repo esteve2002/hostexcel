@@ -136,28 +136,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             className="brand-logo-wordmark brand-logo-wordmark--sidebar"
             priority
           />
-          <div>
-            <div style={{
-              fontSize: "17px",
-              fontWeight: 700,
-              color: "white",
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.3px",
-              lineHeight: 1.2,
-            }}>
-              HostExcel
-            </div>
-            <div style={{
-              fontSize: "10px",
-              color: "rgba(255,255,255,0.3)",
-              fontWeight: 500,
-              letterSpacing: "0.8px",
-              textTransform: "uppercase",
-              marginTop: 1,
-            }}>
-              Restaurantes
-            </div>
-          </div>
         </div>
 
         <div className="sidebar-session card" style={{ marginBottom: 18 }}>

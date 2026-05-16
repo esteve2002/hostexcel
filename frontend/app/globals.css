@@ -287,6 +287,27 @@ input, select, textarea {
   border-radius: 24px;
 }
 
+.logo-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.logo-frame--hero {
+  width: 240px;
+  height: 132px;
+}
+
+.logo-frame--promo {
+  width: 164px;
+  height: 90px;
+}
+
 .app-logo,
 .promo-logo {
   width: 100%;

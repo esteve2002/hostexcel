@@ -471,6 +471,35 @@ input, select, textarea {
   white-space: nowrap;
 }
 
+.language-picker--shell {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+.language-picker-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.language-picker-select {
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 13px;
+  outline: none;
+}
+
 .promo-topnav a:hover,
 .promo-footer a:hover {
   color: var(--primary-dark);

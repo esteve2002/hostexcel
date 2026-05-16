@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Image from "next/image";
+import { useLanguage } from "./LanguageProvider";
 
 const CONTACT_EMAIL = "info@hostexcel.es";
-const LANGUAGE_STORAGE_KEY = "hostexcel_language";
 
 type Lang = "es" | "en";
 
@@ -209,11 +209,7 @@ const COPY: Record<Lang, {
 };
 
 export default function HomePage() {
-  const [language, setLanguage] = useState<Lang>(() => {
-    if (typeof window === 'undefined') return 'es';
-    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    return saved === 'en' ? 'en' : 'es';
-  });
+  const { language } = useLanguage();
   const [form, setForm] = useState({
     nombre: "",
     restaurante: "",
@@ -225,11 +221,6 @@ export default function HomePage() {
   const [showPopup, setShowPopup] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-  }, [language]);
 
   const copy = COPY[language];
 
@@ -320,9 +311,6 @@ export default function HomePage() {
           <a href="#servicios">{copy.nav.services}</a>
           <a href="#contacto">{copy.nav.contact}</a>
           <a href="/login">{copy.nav.login}</a>
-          <button type="button" className="btn-secondary promo-lang-toggle" onClick={() => setLanguage((current) => (current === 'es' ? 'en' : 'es'))}>
-            {copy.toggleTo}
-          </button>
         </nav>
       </header>
 

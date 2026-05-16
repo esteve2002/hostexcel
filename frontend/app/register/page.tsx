@@ -4,15 +4,43 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
+import { useLanguage } from "../LanguageProvider";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { language } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [nombre, setNombre] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; nombre?: string; general?: string }>({});
+
+  const copy = language === 'en'
+    ? {
+        title: 'Create account',
+        subtitle: 'Turn scattered sheets into service decisions',
+        restaurant: 'Restaurant',
+        email: 'Email',
+        password: 'Password',
+        confirmPassword: 'Confirm password',
+        button: 'Create account',
+        loading: 'Creating account...',
+        loginPrompt: 'Already have an account?',
+        login: 'Sign in',
+      }
+    : {
+        title: 'Crear cuenta',
+        subtitle: 'Convierte hojas dispersas en decisiones de sala',
+        restaurant: 'Restaurante',
+        email: 'Email',
+        password: 'Contraseña',
+        confirmPassword: 'Confirmar contraseña',
+        button: 'Crear cuenta',
+        loading: 'Creando cuenta...',
+        loginPrompt: '¿Ya tienes cuenta?',
+        login: 'Inicia sesión',
+      };
 
   const handleRegister = async () => {
     setErrors({});
@@ -51,9 +79,9 @@ export default function RegisterPage() {
         <div className="logo-frame logo-frame--hero">
           <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={240} height={132} className="brand-logo-wordmark brand-logo-wordmark--hero" priority />
         </div>
-        <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "var(--text-primary)" }}>Crear cuenta</h1>
+        <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "var(--text-primary)" }}>{copy.title}</h1>
         <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 8, marginBottom: 32 }}>
-          Convierte hojas dispersas en decisiones de sala
+          {copy.subtitle}
         </p>
 
         <div className="auth-card" style={{
@@ -74,7 +102,7 @@ export default function RegisterPage() {
 
           <div style={{ marginBottom: 16 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Restaurante
+              {copy.restaurant}
             </label>
             <input type="text" value={nombre}
               onChange={(e) => { setNombre(e.target.value); if (errors.nombre) setErrors({ ...errors, nombre: undefined }); }}
@@ -86,7 +114,7 @@ export default function RegisterPage() {
 
           <div style={{ marginBottom: 16 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Email
+              {copy.email}
             </label>
             <input type="email" value={email}
               onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({ ...errors, email: undefined }); }}
@@ -98,7 +126,7 @@ export default function RegisterPage() {
 
           <div style={{ marginBottom: 16 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Contraseña
+              {copy.password}
             </label>
             <input type="password" value={password}
               onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors({ ...errors, password: undefined }); }}
@@ -110,7 +138,7 @@ export default function RegisterPage() {
 
           <div style={{ marginBottom: 24 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Confirmar contraseña
+              {copy.confirmPassword}
             </label>
             <input type="password" value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined }); }}
@@ -126,11 +154,11 @@ export default function RegisterPage() {
             className="btn-primary"
             style={{ width: "100%", padding: "13px", fontSize: 15, justifyContent: "center" }}
           >
-            {loading ? "Creando cuenta..." : "Crear cuenta"}
+            {loading ? copy.loading : copy.button}
           </button>
 
           <p style={{ textAlign: "center", marginTop: 20, fontSize: 14, color: "var(--text-muted)" }}>
-            ¿Ya tienes cuenta?{" "}
+            {copy.loginPrompt}{" "}
             <a href="/login" style={{
               color: "var(--primary)", fontWeight: 600, textDecoration: "none",
               borderBottom: "1px solid transparent", transition: "border-color 0.2s",
@@ -138,7 +166,7 @@ export default function RegisterPage() {
               onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = "var(--primary)"}
               onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = "transparent"}
             >
-              Inicia sesión
+              {copy.login}
             </a>
           </p>
         </div>

@@ -4,13 +4,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { extractErrorMessage, extractNetworkErrorMessage } from "@/lib/errorHandler";
+import { useLanguage } from "../LanguageProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { language } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+
+  const copy = language === 'en'
+    ? {
+        subtitle: 'The kitchen pass for your restaurant spreadsheets',
+        email: 'Email',
+        password: 'Password',
+        button: 'Sign in',
+        loading: 'Signing in...',
+        signupPrompt: "Don't have an account?",
+        signup: 'Sign up',
+      }
+    : {
+        subtitle: 'El pase de cocina para tus Excels de restaurante',
+        email: 'Email',
+        password: 'Contraseña',
+        button: 'Iniciar sesión',
+        loading: 'Entrando...',
+        signupPrompt: '¿No tienes cuenta?',
+        signup: 'Regístrate',
+      };
 
   const handleLogin = async () => {
     setErrors({});
@@ -47,7 +69,7 @@ export default function LoginPage() {
           <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={240} height={132} className="brand-logo-wordmark brand-logo-wordmark--hero" priority />
         </div>
         <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 8, marginBottom: 34 }}>
-          El pase de cocina para tus Excels de restaurante
+          {copy.subtitle}
         </p>
 
         <div className="auth-card" style={{
@@ -68,7 +90,7 @@ export default function LoginPage() {
 
           <div style={{ marginBottom: 18 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Email
+              {copy.email}
             </label>
             <input
               type="email" value={email}
@@ -82,7 +104,7 @@ export default function LoginPage() {
 
           <div style={{ marginBottom: 24 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", display: "block", marginBottom: 4 }}>
-              Contraseña
+              {copy.password}
             </label>
             <input
               type="password" value={password}
@@ -99,11 +121,11 @@ export default function LoginPage() {
             className="btn-primary"
             style={{ width: "100%", padding: "13px", fontSize: 15, justifyContent: "center" }}
           >
-            {loading ? "Entrando..." : "Iniciar sesión"}
+            {loading ? copy.loading : copy.button}
           </button>
 
           <p style={{ textAlign: "center", marginTop: 20, fontSize: 14, color: "var(--text-muted)" }}>
-            ¿No tienes cuenta?{" "}
+            {copy.signupPrompt}{" "}
             <a href="/register" style={{
               color: "var(--primary)", fontWeight: 600, textDecoration: "none",
               borderBottom: "1px solid transparent", transition: "border-color 0.2s",
@@ -111,7 +133,7 @@ export default function LoginPage() {
               onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = "var(--primary)"}
               onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = "transparent"}
             >
-              Regístrate
+              {copy.signup}
             </a>
           </p>
         </div>

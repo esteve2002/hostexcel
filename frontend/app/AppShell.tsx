@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { LanguageProvider, useLanguage } from './LanguageProvider';
 
 type SessionUser = {
   email: string;
@@ -29,10 +30,19 @@ function getSessionInitials(sessionUser: SessionUser | null) {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <LanguageProvider>
+      <AppShellContent>{children}</AppShellContent>
+    </LanguageProvider>
+  );
+}
+
+function AppShellContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isAuthPage = pathname === '/login' || pathname === '/register';
   const isPublicRoot = pathname === '/';
+  const { language, setLanguage } = useLanguage();
   const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [sessionLoading, setSessionLoading] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
@@ -100,6 +110,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     router.replace('/');
   };
 
+  const labels = language === 'en'
+    ? {
+        nav: [
+          { href: '/dashboard', label: 'Home', icon: '📊' },
+          { href: '/subir-excel', label: 'Upload Excel', icon: '📤' },
+          { href: '/historial', label: 'History', icon: '📁' },
+          { href: '/visualizar', label: 'Visualize', icon: '📈' },
+          { href: '/configuracion', label: 'Settings', icon: '⚙️' },
+        ],
+        logout: 'Sign out',
+        verifying: 'Checking',
+        active: 'Active session',
+        workspace: 'Preparing your workspace',
+        language: 'Language',
+      }
+    : {
+        nav: [
+          { href: '/dashboard', label: 'Inicio', icon: '📊' },
+          { href: '/subir-excel', label: 'Subir Excel', icon: '📤' },
+          { href: '/historial', label: 'Historial', icon: '📁' },
+          { href: '/visualizar', label: 'Visualizar', icon: '📈' },
+          { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
+        ],
+        logout: 'Cerrar sesión',
+        verifying: 'Verificando',
+        active: 'Sesión activa',
+        workspace: 'Preparando tu espacio de trabajo',
+        language: 'Idioma',
+      };
+
   if (isAuthPage) {
     return <>{children}</>;
   }
@@ -110,16 +150,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const isActive = (path: string) => pathname === path;
 
-  const navItems = [
-    { href: '/dashboard', label: 'Inicio', icon: '📊' },
-    { href: '/subir-excel', label: 'Subir Excel', icon: '📤' },
-    { href: '/historial', label: 'Historial', icon: '📁' },
-    { href: '/visualizar', label: 'Visualizar', icon: '📈' },
-    { href: '/configuracion', label: 'Configuración', icon: '⚙️' },
-  ];
-
   return (
     <div className="app-frame">
+      <div className="language-picker language-picker--shell card">
+        <label className="language-picker-label" htmlFor="language-select">{labels.language}</label>
+        <select
+          id="language-select"
+          className="language-picker-select"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value === 'en' ? 'en' : 'es')}
+        >
+          <option value="es">Español</option>
+          <option value="en">English</option>
+        </select>
+      </div>
       <aside className="app-sidebar">
         <div className="brand-area" style={{
           display: "flex",
@@ -147,14 +191,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <span className="session-status-pill">
               <span className="session-status-dot" />
-              {sessionLoading ? 'Verificando' : 'Sesión activa'}
+              {sessionLoading ? labels.verifying : labels.active}
             </span>
           </div>
           <div className="sidebar-session-name">
             {sessionUser?.nombre_restaurante || 'HostExcel'}
           </div>
           <div className="sidebar-session-email">
-            {sessionUser?.email || 'Preparando tu espacio de trabajo'}
+            {sessionUser?.email || labels.workspace}
           </div>
           {sessionUser?.plan && (
             <div className="sidebar-session-plan">Plan {sessionUser.plan}</div>
@@ -162,7 +206,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav style={{ display: "flex", flexDirection: "column", gap: "2px", flex: 1 }}>
-          {navItems.map(item => {
+          {labels.nav.map(item => {
             const active = isActive(item.href);
             return (
               <Link
@@ -180,7 +224,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <button type="button" className="sidebar-logout" onClick={handleLogout}>
           <span aria-hidden="true">⟲</span>
-          Cerrar sesión
+          {labels.logout}
         </button>
 
         <div className="sidebar-footnote" style={{

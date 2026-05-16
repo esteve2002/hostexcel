@@ -36,7 +36,7 @@ export default function RegisterPage() {
       } else {
         const data = await res.json();
         document.cookie = `token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-        router.push("/");
+        window.location.assign("/dashboard");
       }
     } catch (err) {
       setErrors({ general: extractNetworkErrorMessage(err) });

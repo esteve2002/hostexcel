@@ -103,14 +103,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (isPublicRoot && !sessionToken) {
+  if (isPublicRoot) {
     return <>{children}</>;
   }
 
   const isActive = (path: string) => pathname === path;
 
   const navItems = [
-    { href: '/', label: 'Inicio', icon: '📊' },
+    { href: '/dashboard', label: 'Inicio', icon: '📊' },
     { href: '/subir-excel', label: 'Subir Excel', icon: '📤' },
     { href: '/historial', label: 'Historial', icon: '📁' },
     { href: '/visualizar', label: 'Visualizar', icon: '📈' },

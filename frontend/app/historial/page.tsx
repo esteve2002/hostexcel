@@ -140,7 +140,7 @@ export default function HistorialPage() {
             <h1 className="page-title">📋 Historial de Subidas</h1>
             <p className="page-subtitle">Gestiona y revisa todas tus subidas de archivos Excel.</p>
           </div>
-          <button onClick={() => router.push("/")} className="ghost-button">← Volver</button>
+          <button onClick={() => router.push("/dashboard")} className="ghost-button">← Volver</button>
         </div>
 
         {error && <div className="section-card section-card--pad status-error">❌ {error}</div>}

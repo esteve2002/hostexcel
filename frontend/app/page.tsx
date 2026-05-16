@@ -85,7 +85,7 @@ export default function HomePage() {
       <header className="promo-topbar card">
         <div>
           <div className="promo-brandline">
-            <Image src="/images/hostexcel_logo.png" alt="HostExcel" width={52} height={52} className="promo-logo" priority />
+            <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={164} height={90} className="promo-logo promo-logo--wordmark" priority />
             <div>
               <span className="promo-badge">HostExcel para restaurantes</span>
               <p className="promo-topbar-copy">Control de datos, márgenes y stock sin fricción.</p>

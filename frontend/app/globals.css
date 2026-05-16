@@ -295,6 +295,26 @@ input, select, textarea {
   display: block;
 }
 
+.brand-logo-wordmark {
+  display: block;
+  object-fit: contain;
+}
+
+.brand-logo-wordmark--sidebar {
+  width: 164px;
+  height: auto;
+}
+
+.brand-logo-wordmark--hero {
+  width: 240px;
+  height: auto;
+}
+
+.promo-logo--wordmark {
+  width: 164px;
+  height: auto;
+}
+
 .nav-link {
   color: rgba(255,255,255,0.58);
   text-decoration: none;

@@ -128,16 +128,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           padding: "4px 12px 0",
           marginBottom: "36px",
         }}>
-          <div className="app-logo-shell">
-            <Image
-              src="/images/hostexcel_logo.png"
-              alt="HostExcel"
-              width={64}
-              height={64}
-              className="app-logo"
-              priority
-            />
-          </div>
+          <Image
+            src="/images/hostexcel_logo_clean.png"
+            alt="HostExcel"
+            width={164}
+            height={90}
+            className="brand-logo-wordmark brand-logo-wordmark--sidebar"
+            priority
+          />
           <div>
             <div style={{
               fontSize: "17px",

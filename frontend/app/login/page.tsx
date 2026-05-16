@@ -43,17 +43,7 @@ export default function LoginPage() {
   return (
     <div className="auth-shell">
       <div className="animate-fade-in-up" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div
-          className="app-logo-shell app-logo-shell--hero"
-          style={{
-            marginBottom: 20,
-          }}
-        >
-          <Image src="/images/hostexcel_logo.png" alt="HostExcel" width={96} height={96} className="app-logo" priority />
-        </div>
-        <h1 style={{ fontSize: 42, fontWeight: 850, margin: 0, letterSpacing: "-1px", color: "var(--text-primary)" }}>
-          HostExcel
-        </h1>
+        <Image src="/images/hostexcel_logo_clean.png" alt="HostExcel" width={240} height={132} className="brand-logo-wordmark brand-logo-wordmark--hero" priority />
         <p style={{ color: "var(--text-secondary)", fontSize: 15, marginTop: 8, marginBottom: 34 }}>
           El pase de cocina para tus Excels de restaurante
         </p>

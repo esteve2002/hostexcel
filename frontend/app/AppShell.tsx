@@ -128,14 +128,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           padding: "4px 12px 0",
           marginBottom: "36px",
         }}>
-          <Image
-            src="/images/hostexcel_logo_clean.png"
-            alt="HostExcel"
-            width={164}
-            height={90}
-            className="brand-logo-wordmark brand-logo-wordmark--sidebar"
-            priority
-          />
+          <div className="logo-frame logo-frame--sidebar">
+            <Image
+              src="/images/hostexcel_logo_clean.png"
+              alt="HostExcel"
+              width={164}
+              height={90}
+              className="brand-logo-wordmark brand-logo-wordmark--sidebar"
+              priority
+            />
+          </div>
         </div>
 
         <div className="sidebar-session card" style={{ marginBottom: 18 }}>

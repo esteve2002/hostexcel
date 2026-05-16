@@ -140,30 +140,34 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         language: 'Idioma',
       };
 
+  const languagePicker = (
+    <div className="language-picker language-picker--shell card">
+      <label className="language-picker-label" htmlFor="language-select">{labels.language}</label>
+      <select
+        id="language-select"
+        className="language-picker-select"
+        value={language}
+        onChange={(event) => setLanguage(event.target.value === 'en' ? 'en' : 'es')}
+      >
+        <option value="es">Español</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  );
+
   if (isAuthPage) {
-    return <>{children}</>;
+    return <>{languagePicker}{children}</>;
   }
 
   if (isPublicRoot) {
-    return <>{children}</>;
+    return <>{languagePicker}{children}</>;
   }
 
   const isActive = (path: string) => pathname === path;
 
   return (
     <div className="app-frame">
-      <div className="language-picker language-picker--shell card">
-        <label className="language-picker-label" htmlFor="language-select">{labels.language}</label>
-        <select
-          id="language-select"
-          className="language-picker-select"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value === 'en' ? 'en' : 'es')}
-        >
-          <option value="es">Español</option>
-          <option value="en">English</option>
-        </select>
-      </div>
+      {languagePicker}
       <aside className="app-sidebar">
         <div className="brand-area" style={{
           display: "flex",

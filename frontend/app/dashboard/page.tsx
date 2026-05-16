@@ -13,6 +13,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { useLanguage } from "../LanguageProvider";
 
 interface Venta {
   fecha: string;
@@ -53,49 +54,77 @@ function getTokenFromCookie() {
 }
 
 function PublicLanding() {
-  const highlights = [
-    { value: '3x', label: 'menos trabajo manual' },
-    { value: '24/7', label: 'panel disponible' },
-    { value: '1 clic', label: 'de Excel a decisión' },
-  ];
-
-  const features = [
-    {
-      title: 'Carga de Excel guiada',
-      text: 'Sube archivos y deja que la app detecte tipos, columnas y mapeos con menos fricción.',
-    },
-    {
-      title: 'Dashboard para restauración',
-      text: 'Ventas, inventario, escandallo y proveedores en una sola vista clara y ordenada.',
-    },
-    {
-      title: 'Control y seguimiento',
-      text: 'Historial de importaciones, validaciones y ajustes para mantener todo bajo control.',
-    },
-  ];
+  const { language } = useLanguage();
+  const copy = language === 'en'
+    ? {
+        badge: 'HostExcel for restaurants',
+        title: 'Turn your spreadsheets into clear decisions for front and kitchen.',
+        text: 'Centralize sales, inventory, cost breakdowns, and suppliers in a fast, visual tool made for restaurant teams.',
+        primary: 'Start free',
+        secondary: 'Open the app',
+        panelLabel: 'Quick summary',
+        panelChip: 'Live',
+        steps: ['Upload your file', 'The app maps columns', 'Review and act'],
+        features: [
+          { title: 'Guided Excel upload', text: 'Upload files and let the app detect types, columns, and mappings with less friction.' },
+          { title: 'Restaurant dashboard', text: 'Sales, inventory, cost breakdowns, and suppliers in one clear, organized view.' },
+          { title: 'Control and tracking', text: 'Import history, validations, and adjustments to keep everything under control.' },
+        ],
+        ctaTitle: 'Ready to organize your data?',
+        ctaText: 'Start from the landing or go directly to the panel if you already have an account.',
+        ctaPrimary: 'Create account',
+        ctaSecondary: 'Sign in',
+        highlights: [
+          { value: '3x', label: 'less manual work' },
+          { value: '24/7', label: 'dashboard access' },
+          { value: '1 click', label: 'from Excel to action' },
+        ],
+      }
+    : {
+        badge: 'HostExcel para restaurantes',
+        title: 'Convierte tus Excels en decisiones claras para sala y cocina.',
+        text: 'Centraliza ventas, inventario, escandallos y proveedores en una herramienta visual, rápida y pensada para equipos de restauración.',
+        primary: 'Empezar gratis',
+        secondary: 'Entrar a la app',
+        panelLabel: 'Resumen rápido',
+        panelChip: 'En vivo',
+        steps: ['Sube tu archivo', 'La app mapea columnas', 'Visualiza y actúa'],
+        features: [
+          { title: 'Carga de Excel guiada', text: 'Sube archivos y deja que la app detecte tipos, columnas y mapeos con menos fricción.' },
+          { title: 'Dashboard para restauración', text: 'Ventas, inventario, escandallo y proveedores en una sola vista clara y ordenada.' },
+          { title: 'Control y seguimiento', text: 'Historial de importaciones, validaciones y ajustes para mantener todo bajo control.' },
+        ],
+        ctaTitle: '¿Listo para ordenar tus datos?',
+        ctaText: 'Empieza por la landing o entra directamente al panel si ya tienes cuenta.',
+        ctaPrimary: 'Crear cuenta',
+        ctaSecondary: 'Iniciar sesión',
+        highlights: [
+          { value: '3x', label: 'menos trabajo manual' },
+          { value: '24/7', label: 'panel disponible' },
+          { value: '1 clic', label: 'de Excel a decisión' },
+        ],
+      };
 
   return (
     <div className="promo-shell">
       <section className="promo-hero card">
         <div className="promo-hero-copy">
-          <span className="promo-badge">HostExcel para restaurantes</span>
-          <h1 className="promo-title">Convierte tus Excels en decisiones claras para sala y cocina.</h1>
-          <p className="promo-text">
-            Centraliza ventas, inventario, escandallos y proveedores en una herramienta visual, rápida y pensada para equipos de restauración.
-          </p>
+          <span className="promo-badge">{copy.badge}</span>
+          <h1 className="promo-title">{copy.title}</h1>
+          <p className="promo-text">{copy.text}</p>
           <div className="promo-actions">
-            <a className="btn-primary" href="/register">Empezar gratis</a>
-            <a className="btn-secondary" href="/login">Entrar a la app</a>
+            <a className="btn-primary" href="/register">{copy.primary}</a>
+            <a className="btn-secondary" href="/login">{copy.secondary}</a>
           </div>
         </div>
 
         <div className="promo-hero-panel card">
           <div className="promo-panel-top">
-            <span className="promo-panel-label">Resumen rápido</span>
-            <span className="promo-panel-chip">En vivo</span>
+            <span className="promo-panel-label">{copy.panelLabel}</span>
+            <span className="promo-panel-chip">{copy.panelChip}</span>
           </div>
           <div className="promo-metrics">
-            {highlights.map((item) => (
+            {copy.highlights.map((item) => (
               <div key={item.label} className="promo-metric">
                 <strong>{item.value}</strong>
                 <span>{item.label}</span>
@@ -105,22 +134,22 @@ function PublicLanding() {
           <div className="promo-steps">
             <div>
               <span>1</span>
-              <p>Sube tu archivo</p>
+              <p>{copy.steps[0]}</p>
             </div>
             <div>
               <span>2</span>
-              <p>La app mapea columnas</p>
+              <p>{copy.steps[1]}</p>
             </div>
             <div>
               <span>3</span>
-              <p>Visualiza y actúa</p>
+              <p>{copy.steps[2]}</p>
             </div>
           </div>
         </div>
       </section>
 
       <section className="promo-features">
-        {features.map((feature) => (
+        {copy.features.map((feature) => (
           <article key={feature.title} className="promo-feature card card-hover">
             <h2>{feature.title}</h2>
             <p>{feature.text}</p>
@@ -130,12 +159,12 @@ function PublicLanding() {
 
       <section className="promo-cta card">
         <div>
-          <h2>¿Listo para ordenar tus datos?</h2>
-          <p>Empieza por la landing o entra directamente al panel si ya tienes cuenta.</p>
+          <h2>{copy.ctaTitle}</h2>
+          <p>{copy.ctaText}</p>
         </div>
         <div className="promo-actions">
-          <a className="btn-primary" href="/register">Crear cuenta</a>
-          <a className="btn-secondary" href="/login">Iniciar sesión</a>
+          <a className="btn-primary" href="/register">{copy.ctaPrimary}</a>
+          <a className="btn-secondary" href="/login">{copy.ctaSecondary}</a>
         </div>
       </section>
     </div>
